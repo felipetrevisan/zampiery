@@ -21,7 +21,7 @@ const rankingListFormSchema = z.object({
 
 export type RankingListFormSchema = z.infer<typeof rankingListFormSchema>
 
-export function RankingList(rankingLists: Ranking[]) {
+export function RankingList({ rankingLists }: { rankingLists: Ranking[] }) {
   const queryClient = useQueryClient()
   const [selectedList, setSelectedList] = useState<Ranking | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)

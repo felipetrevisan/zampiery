@@ -18,7 +18,6 @@ export const env = createEnv({
   server: {
     SANITY_API_READ_TOKEN: z.string().refine(requiredOnEnv('production')),
     SANITY_API_WRITE_TOKEN: z.string().refine(requiredOnEnv('production')),
-    API_FOOTBALL_TEAMS: z.string().refine(requiredOnEnv('production')),
   },
   client: {
     NEXT_PUBLIC_VERCEL_URL: z.string().url().min(1),
@@ -34,7 +33,6 @@ export const env = createEnv({
   runtimeEnv: {
     SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN,
     SANITY_API_WRITE_TOKEN: process.env.SANITY_API_WRITE_TOKEN,
-    API_FOOTBALL_TEAMS: process.env.API_FOOTBALL_TEAMS,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,

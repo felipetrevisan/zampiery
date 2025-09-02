@@ -1,15 +1,11 @@
 'use client'
 
-import { type Cycle, useCycle } from 'framer-motion'
-import { usePathname } from 'next/navigation'
 import {
   type Dispatch,
   type ReactNode,
   type SetStateAction,
   createContext,
-  useCallback,
   useContext,
-  useEffect,
   useState,
 } from 'react'
 import type { ThemeColor } from '../types/settings'

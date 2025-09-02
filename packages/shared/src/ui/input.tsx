@@ -1,5 +1,5 @@
 import { cn } from '@nathy/shared/lib/utils'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 function Input({
   className,
