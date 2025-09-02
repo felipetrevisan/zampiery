@@ -24,7 +24,7 @@
   },
   "globalEnv": [
     "SANITY_API_READ_TOKEN",
-    "RESEND_API_KEY",
+    "SANITY_API_WRITE_TOKEN",
     "SANITY_STUDIO_DATASET",
     "SANITY_STUDIO_PROJECT_ID"
   ]
