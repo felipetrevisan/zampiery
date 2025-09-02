@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": "./src",
+    "paths": {
+      "@nathy/web/*": ["*"],
+      "@nathy/shared/*": ["../../../packages/shared/src/*"]
+    }
+  },
+  "include": ["web/next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"],
+  "watchOptions": {
+    "excludeDirectories": ["node_modules", ".next", ".turbo"]
+  }
+}

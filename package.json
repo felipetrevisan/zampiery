@@ -1,0 +1,52 @@
+{
+  "name": "nathy",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev:web": "pnpm --filter web dev",
+    "dev:studio": "pnpm --filter studio dev",
+    "lint:apps:check": "pnpm biome check --formatter-enabled=true --linter-enabled=true --organize-imports-enabled=false ./apps/**/src",
+    "lint:apps:organize": "pnpm biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write ./apps/**/src",
+    "lint:apps:format": "pnpm biome format --write ./apps/**/src",
+    "lint:packages:check": "pnpm biome check --formatter-enabled=true --linter-enabled=true --organize-imports-enabled=false ./packages/src",
+    "lint:packages:organize": "pnpm biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write ./packages/src",
+    "lint:packages:format": "pnpm biome format --write ./packages/src"
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "0.13.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "17.2.0",
+    "framer-motion": "^12.0.6",
+    "motion": "12.15.0",
+    "sass": "^1.71.1",
+    "vaul": "^1.1.2",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^20",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "tailwindcss": "^4.1.7",
+    "turbo": "2.5.5",
+    "typescript": "^5.8"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "@types/react": "19.1.8",
+      "@types/react-dom": "19.1.6"
+    }
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "packageManager": "pnpm@10.4.1"
+}
