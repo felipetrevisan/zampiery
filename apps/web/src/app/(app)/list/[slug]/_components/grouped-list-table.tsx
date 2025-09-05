@@ -49,30 +49,32 @@ export function GroupedListTable({ list }: TableProps) {
       )}
       <div className="space-y-2">
         {list.games?.length > 0 &&
-          Object.entries(groupedByDate)?.map(([date, games]) => (
-            <div
-              className={cn(
-                'flex w-full justify-between rounded-2xl border-1 border-primary/20 bg-primary/10 p-3 backdrop-blur-2xl',
-              )}
-              key={date}
-            >
-              <Collapsible className="w-full">
-                <CollapsibleTrigger className='flex items-center justify-between font-russo text-2xl text-primary'>
-                  <span>{new Date(date).toLocaleDateString('pt-BR')}</span>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="mt-10 grid grid-cols-[repeat(4,max-content)] gap-4">
-                    {games.map((game, index) => (
-                      <GameCard key={game.slug} game={game} index={index} />
-                    ))}
-                    <div className="flex items-center justify-center gap-4">
-                      <GameAddButton onAddGame={() => handleAddGameDialog(date)} />
+          Object.entries(groupedByDate)
+            .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
+            .map(([date, games]) => (
+              <div
+                className={cn(
+                  'flex w-full justify-between rounded-2xl border-1 border-primary/20 bg-primary/10 p-3 backdrop-blur-2xl',
+                )}
+                key={date}
+              >
+                <Collapsible className="w-full">
+                  <CollapsibleTrigger className="flex items-center justify-between font-russo text-2xl text-primary">
+                    <span>{new Date(date).toLocaleDateString('pt-BR')}</span>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="mt-10 grid grid-cols-[repeat(4,max-content)] gap-4">
+                      {games.map((game, index) => (
+                        <GameCard key={game.slug} game={game} index={index} />
+                      ))}
+                      <div className="flex items-center justify-center gap-4">
+                        <GameAddButton onAddGame={() => handleAddGameDialog(date)} />
+                      </div>
                     </div>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            ))}
       </div>
       {/* <AddGameDialog
         dialogOpen={isDialogOpen}

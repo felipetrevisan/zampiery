@@ -5,7 +5,7 @@ import {
   mutateDeleteRanking,
   mutateUpdateRanking,
 } from '@nathy/web/server/ranking'
-import type { Ranking } from '@nathy/web/types/ranking'
+import type { PaginatedRanking, PaginatedSingleRanking, Ranking } from '@nathy/web/types/ranking'
 import { generateSlug } from '@nathy/web/utils/url'
 import { type QueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -15,42 +15,76 @@ export const useMutationCreateRanking = (queryClient: QueryClient) =>
   useMutation({
     mutationFn: (data: Omit<Ranking, 'id' | 'players' | 'slug' | 'playersCount'>) =>
       mutateCreateRanking(data),
+
     onMutate: async ({ title }) => {
-      await queryClient.cancelQueries({ queryKey: ['ranking-lists'] })
-      const previousList = queryClient.getQueryData<Ranking[]>(['ranking-lists'])
+      await queryClient.cancelQueries({ queryKey: ['ranking-lists-paginated'] })
 
-      if (!previousList) return { previousList }
+      const previousData = queryClient.getQueryData<{
+        pages: PaginatedRanking[]
+        pageParams: unknown[]
+      }>(['ranking-lists-paginated'])
 
-      const optimisticList = {
+      if (!previousData) return { previousData }
+
+      const optimisticList: Ranking = {
         id: v4(),
         title,
+        slug: generateSlug(title),
         players: [],
         playersCount: 0,
-        slug: generateSlug(title),
-      } satisfies Ranking
+      }
 
-      queryClient.setQueryData<Ranking[]>(['ranking-lists'], (oldList) => {
-        if (!oldList) return []
-        return [...oldList, optimisticList]
+      queryClient.setQueryData<{
+        pages: PaginatedRanking[]
+        pageParams: unknown[]
+      }>(['ranking-lists-paginated'], (oldData) => {
+        if (!oldData) return oldData
+
+        const firstPage = oldData.pages[0]
+        const newFirstPage: PaginatedRanking = {
+          ...firstPage,
+          data: [optimisticList, ...firstPage.data],
+          total: firstPage.total + 1,
+        }
+
+        return {
+          ...oldData,
+          pages: [newFirstPage, ...oldData.pages.slice(1)],
+        }
       })
 
-      return { previousList, optimisticId: optimisticList.id }
+      return { previousData, optimisticId: optimisticList.id }
     },
+
     onError: (_err, _variables, context) => {
-      if (context?.previousList) {
-        queryClient.setQueryData(['ranking-lists'], context.previousList)
+      if (context?.previousData) {
+        queryClient.setQueryData(['ranking-lists-paginated'], context.previousData)
       }
       toast.error('Erro ao criar nova lista rankeada')
     },
+
     onSuccess: (createdList, _variables, context) => {
-      queryClient.setQueryData<Ranking[]>(['ranking-lists'], (oldList) => {
-        if (!oldList) return oldList
+      queryClient.setQueryData<{
+        pages: PaginatedRanking[]
+        pageParams: unknown[]
+      }>(['ranking-lists-paginated'], (oldData) => {
+        if (!oldData) return oldData
 
-        if (!oldList) return []
+        const newPages = oldData.pages.map((page, pageIndex) => {
+          if (pageIndex !== 0) return page // só a primeira página recebe a nova lista
 
-        return oldList.map((list) =>
-          list.id === context?.optimisticId ? { ...list, ...createdList } : list,
-        )
+          return {
+            ...page,
+            data: page.data.map((list) =>
+              list.id === context?.optimisticId ? { ...list, ...createdList } : list,
+            ),
+          }
+        })
+
+        return {
+          ...oldData,
+          pages: newPages,
+        }
       })
 
       toast.success('Lista rankeada criada com sucesso')
@@ -62,8 +96,10 @@ export const useMutationUpdateRanking = (queryClient: QueryClient) =>
     mutationFn: ({
       id,
       data,
-    }: { id: string; data: Omit<Ranking, 'id' | 'players' | 'slug' | 'playersCount'> }) =>
-      mutateUpdateRanking(id, data),
+    }: {
+      id: string
+      data: Omit<Ranking, 'id' | 'players' | 'slug' | 'playersCount'>
+    }) => mutateUpdateRanking(id, data),
     onMutate: async ({ data, id }) => {
       await queryClient.cancelQueries({ queryKey: ['ranking-lists'] })
       const previousList = queryClient.getQueryData<Ranking[]>(['ranking-lists'])
@@ -138,11 +174,20 @@ export const useMutationDeleteRanking = (queryClient: QueryClient) =>
 
 export const useMutationAddPersonToRanking = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: ({ ranking, player }: { ranking: Ranking; player: { id: string; name: string } }) =>
-      mutateAddPersonToRanking({ ranking, player: { id: player.id } }),
+    mutationFn: ({
+      ranking,
+      player,
+    }: {
+      ranking: PaginatedSingleRanking
+      player: { id: string; name: string }
+    }) => mutateAddPersonToRanking({ ranking, player: { id: player.id } }),
     onMutate: async ({ ranking, player }) => {
-      await queryClient.cancelQueries({ queryKey: ['ranking-list', ranking.slug] })
-      const previousRanking = queryClient.getQueryData<Ranking>(['ranking-list', ranking.slug])
+      await queryClient.cancelQueries({ queryKey: ['ranking-list-paginated', ranking.slug] })
+
+      const previousRanking = queryClient.getQueryData<{
+        pages: PaginatedSingleRanking[]
+        pageParams: unknown[]
+      }>(['ranking-list-paginated', ranking.slug])
 
       if (!previousRanking) return { previousRanking }
 
@@ -151,88 +196,121 @@ export const useMutationAddPersonToRanking = (queryClient: QueryClient) =>
         name: player.name ?? 'Sem nome',
       }
 
-      queryClient.setQueryData<Ranking>(['ranking-list', ranking.slug], (oldRanking) => {
-        if (!oldRanking) return oldRanking
-        return {
-          ...oldRanking,
-          players: [...(oldRanking.players ?? []), optimisticPlayer],
-        }
-      })
+      queryClient.setQueryData(
+        ['ranking-list-paginated', ranking.slug],
+        (oldData?: typeof previousRanking) => {
+          if (!oldData) return oldData
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page, idx) => {
+              if (idx === 0) {
+                return {
+                  ...page,
+                  total: page.total + 1,
+                  data: [...page.data, optimisticPlayer],
+                }
+              }
+              return page
+            }),
+          }
+        },
+      )
 
       return { previousRanking, optimisticId: optimisticPlayer.id }
     },
     onError: (_err, variables, context) => {
       if (context?.previousRanking) {
-        queryClient.setQueryData(['ranking-list', variables.ranking.slug], context.previousRanking)
+        queryClient.setQueryData(
+          ['ranking-list-paginated', variables.ranking.slug],
+          context.previousRanking,
+        )
       }
       toast.error('Erro ao adicionar a pessoa ao ranking')
     },
-    onSuccess: (createdRankingPlayer, variables, _context) => {
-      queryClient.setQueryData<Ranking>(['ranking-list', variables.ranking.slug], (oldRanking) => {
-        if (!oldRanking) return oldRanking
+    onSuccess: (createdRankingPlayer, variables) => {
+      queryClient.setQueryData(
+        ['ranking-list-paginated', variables.ranking.slug],
+        (oldData?: { pages: PaginatedSingleRanking[]; pageParams: unknown[] }) => {
+          if (!oldData) return oldData
 
-        const sanityPlayer = createdRankingPlayer.players?.[0]
-        const newPlayerId = sanityPlayer?.player?._ref
+          const sanityPlayer = createdRankingPlayer.players?.[0]
+          const newPlayerId = sanityPlayer?.player?._ref
 
-        if (!newPlayerId) return oldRanking
+          if (!newPlayerId) return oldData
 
-        const syncedPlayer = {
-          id: newPlayerId,
-          name: variables.player.name ?? 'Sem nome',
-        }
+          const syncedPlayer = {
+            id: newPlayerId,
+            name: variables.player.name ?? 'Sem nome',
+          }
 
-        return {
-          ...oldRanking,
-          players: [...(oldRanking.players ?? []), syncedPlayer],
-        }
-      })
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page, idx) => {
+              if (idx === 0) {
+                return {
+                  ...page,
+                  total: page.total,
+                  data: [...page.data, syncedPlayer],
+                }
+              }
+              return page
+            }),
+          }
+        },
+      )
 
-      toast.success('Lista rankeada criada com sucesso')
+      toast.success('Jogador adicionado com sucesso')
     },
   })
 
 export const useMutationDeletePersonFromRanking = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: ({ ranking, playerId }: { ranking: Ranking; playerId: string }) =>
+    mutationFn: ({ ranking, playerId }: { ranking: PaginatedSingleRanking; playerId: string }) =>
       mutateDeletePersonFromRanking({ ranking, playerId }),
+
     onMutate: async ({ ranking, playerId }) => {
-      await queryClient.cancelQueries({ queryKey: ['ranking-list', ranking.slug] })
-      const previousRanking = queryClient.getQueryData<Ranking>(['ranking-list', ranking.slug])
+      await queryClient.cancelQueries({ queryKey: ['ranking-list-paginated', ranking.slug] })
+      const previousData = queryClient.getQueryData<{
+        pages: PaginatedSingleRanking[]
+        pageParams: unknown[]
+      }>(['ranking-list-paginated', ranking.slug])
 
-      if (!previousRanking) return { previousRanking }
+      if (!previousData) return { previousData }
 
-      queryClient.setQueryData<Ranking[]>(['ranking-list', ranking.slug], (oldRanking) => {
-        if (!oldRanking) return []
-        return oldRanking.map((r) => {
-          if (r.id !== ranking.id) return r
+      // Otimisticamente remove o jogador do cache
+      queryClient.setQueryData(
+        ['ranking-list-paginated', ranking.slug],
+        (oldData?: typeof previousData) => {
+          if (!oldData) return oldData
 
           return {
-            ...r,
-            players: r.players.filter((p) => p.id !== playerId),
-            playersCount: r.playersCount - 1,
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              total: page.total - 1,
+              data: page.data.filter((player) => player.id !== playerId),
+            })),
           }
-        })
-      })
+        },
+      )
 
-      return { previousRanking }
+      return { previousData }
     },
+
     onError: (_err, variables, context) => {
-      if (context?.previousRanking) {
-        queryClient.setQueryData(['ranking-list', variables.ranking.slug], context.previousRanking)
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ['ranking-list-paginated', variables.ranking.slug],
+          context.previousData,
+        )
       }
       toast.error('Erro ao deletar a pessoa do ranking')
     },
-    onSuccess: (updatedRanking, variables) => {
-      queryClient.setQueryData<Ranking>(['ranking-list', variables.ranking.slug], (oldRanking) => {
-        if (!oldRanking) return oldRanking
 
-        return {
-          ...oldRanking,
-          players: (oldRanking.players ?? []).filter((p) => p.id !== variables.playerId),
-          playersCount: updatedRanking.playersCount,
-        }
-      })
-
+    onSuccess: (_updatedRanking, _variables) => {
+      // Se quiser, você pode sincronizar de novo com o server aqui,
+      // mas geralmente o otimistic update já garante que o UI está correto
       toast.success('Pessoa deletada com sucesso do ranking')
     },
   })

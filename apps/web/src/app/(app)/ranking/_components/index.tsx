@@ -6,11 +6,11 @@ import {
   useMutationDeleteRanking,
   useMutationUpdateRanking,
 } from '@nathy/web/hooks/mutations/ranking'
-import type { Ranking } from '@nathy/web/types/ranking'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { usePaginatedRankingList } from '@nathy/web/hooks/use-ranking'
+import type { PaginatedRanking, Ranking } from '@nathy/web/types/ranking'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { z } from 'zod'
 import { Header } from './header'
 import { RankingTable } from './ranking-table'
@@ -21,10 +21,12 @@ const rankingListFormSchema = z.object({
 
 export type RankingListFormSchema = z.infer<typeof rankingListFormSchema>
 
-export function RankingList({ rankingLists }: { rankingLists: Ranking[] }) {
+export function RankingList({ data }: { data: PaginatedRanking }) {
   const queryClient = useQueryClient()
   const [selectedList, setSelectedList] = useState<Ranking | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { allRankingList, hasNextPage, isPending, isFetchingNextPage, fetchNextPage } =
+    usePaginatedRankingList(data)
 
   const rankingListForm = useForm<RankingListFormSchema>({
     resolver: zodResolver(rankingListFormSchema),
@@ -53,7 +55,7 @@ export function RankingList({ rankingLists }: { rankingLists: Ranking[] }) {
 
   return (
     <FormProvider {...rankingListForm}>
-      <div className="space-y-4">
+      <div className="space-y-4 p-4">
         <Header
           onSubmit={handleSubmit(handleAddNewRankingList)}
           onEdit={handleSubmit(handleEditRankingList)}
@@ -61,13 +63,17 @@ export function RankingList({ rankingLists }: { rankingLists: Ranking[] }) {
           onSelectList={setSelectedList}
           dialogOpen={isDialogOpen}
           selectedList={selectedList}
-          rankingLists={rankingLists}
+          rankingListTotalCount={allRankingList.length}
         />
         <RankingTable
           onDelete={handleDeleteRankingList}
           onDialogOpen={setIsDialogOpen}
           onSelectList={setSelectedList}
-          initialData={rankingLists}
+          allRankingList={allRankingList}
+          hasNextPage={hasNextPage}
+          isPending={isPending}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
         />
       </div>
     </FormProvider>

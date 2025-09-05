@@ -2,8 +2,8 @@
 
 import { sanityFetch } from '@nathy/web/client/fetch'
 import { sanityMutate } from '@nathy/web/client/mutation'
-import { getPlayersQuery } from '@nathy/web/client/queries'
-import type { Player } from '@nathy/web/types/player'
+import { getPaginatedPlayersQuery, getPlayersQuery } from '@nathy/web/client/queries'
+import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
 import type { SanityDocumentStub } from 'next-sanity'
 import { v4 } from 'uuid'
 
@@ -11,7 +11,24 @@ export async function getPlayers() {
   return sanityFetch<Player[]>({ query: getPlayersQuery })
 }
 
-export async function mutateCreatePlayer({ name, favoritePosition, favoriteTeam }: Omit<Player, 'id'>) {
+export async function getPaginatedPlayers({
+  offset,
+  pageSize,
+}: {
+  offset: number
+  pageSize: number
+}): Promise<PaginatedPlayers> {
+  return sanityFetch<PaginatedPlayers>({
+    query: getPaginatedPlayersQuery,
+    params: { offset, pageSize },
+  })
+}
+
+export async function mutateCreatePlayer({
+  name,
+  favoritePosition,
+  favoriteTeam,
+}: Omit<Player, 'id'>) {
   return sanityMutate<SanityDocumentStub<Player>>({
     type: 'create',
     doc: {
@@ -20,7 +37,7 @@ export async function mutateCreatePlayer({ name, favoritePosition, favoriteTeam 
       name,
       favoritePosition,
       favoriteTeam,
-    }
+    },
   })
 }
 
@@ -34,7 +51,7 @@ export async function mutateUpdatePlayer(
     patchData: {
       name,
       favoritePosition,
-      favoriteTeam
+      favoriteTeam,
     },
   })
 }
@@ -42,6 +59,6 @@ export async function mutateUpdatePlayer(
 export async function mutateDeletePlayer(id: string) {
   return sanityMutate<SanityDocumentStub<Player>>({
     type: 'delete',
-    id
+    id,
   })
 }

@@ -1,3 +1,12 @@
+export type PaginatedPlayers = {
+  data: Player[]
+  total: number
+  page: number
+  pageSize: number
+  nextOffset: number
+  hasNextPage: boolean
+}
+
 export type Player = {
   id: string
   name: string

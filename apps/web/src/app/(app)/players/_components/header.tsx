@@ -14,8 +14,13 @@ import {
 import { Button } from '@nathy/shared/ui/button'
 import { ComboboxField } from '@nathy/shared/ui/combobox'
 import { Separator } from '@nathy/shared/ui/separator'
+import { BaseHeader } from '@nathy/web/components/base-header'
 import { useTeam } from '@nathy/web/hooks/use-team'
-import { type Player, PlayerPosition, PlayerPositionLabels } from '@nathy/web/types/player'
+import {
+  type Player,
+  PlayerPosition,
+  PlayerPositionLabels,
+} from '@nathy/web/types/player'
 import { Loader2Icon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
@@ -27,6 +32,7 @@ interface HeaderProps {
   onDialogOpen: (state: boolean) => void
   selectedPlayer: Player | null
   dialogOpen: boolean
+  playersTotalCount: number
 }
 
 export function Header({
@@ -36,6 +42,7 @@ export function Header({
   onSelectPlayer,
   dialogOpen,
   selectedPlayer,
+  playersTotalCount = 0,
 }: HeaderProps) {
   const {
     register,
@@ -72,11 +79,7 @@ export function Header({
   }, [selectedPlayer, reset])
 
   return (
-    <div className="flex items-center justify-between">
-      <h2 className='flex items-center gap-2 font-bold text-2xl text-primary tracking-tight'>
-        Jogadores
-      </h2>
-
+    <BaseHeader title="Jogadores" showTotalCount totalCount={playersTotalCount}>
       <div className="flex items-center gap-2">
         <Separator orientation="vertical" className="h-6" />
 
@@ -150,6 +153,6 @@ export function Header({
           </form>
         </Dialog>
       </div>
-    </div>
+    </BaseHeader>
   )
 }

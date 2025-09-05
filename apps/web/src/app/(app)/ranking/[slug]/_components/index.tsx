@@ -5,7 +5,8 @@ import {
   useMutationAddPersonToRanking,
   useMutationDeletePersonFromRanking,
 } from '@nathy/web/hooks/mutations/ranking'
-import type { Ranking } from '@nathy/web/types/ranking'
+import { usePaginatedRankingListBySlug } from '@nathy/web/hooks/use-ranking'
+import type { PaginatedSingleRanking } from '@nathy/web/types/ranking'
 import { useQueryClient } from '@tanstack/react-query'
 import { FormProvider, useForm } from 'react-hook-form'
 import z from 'zod'
@@ -21,8 +22,10 @@ const personFormSchema = z.object({
 
 export type PersonFormSchema = z.infer<typeof personFormSchema>
 
-export function RankingListView(ranking: Ranking) {
+export function RankingListView({ data }: { data: PaginatedSingleRanking }) {
   const queryClient = useQueryClient()
+  const { allData, hasNextPage, isPending, isFetchingNextPage, fetchNextPage } =
+    usePaginatedRankingListBySlug(data, data.slug)
 
   const personForm = useForm<PersonFormSchema>({
     resolver: zodResolver(personFormSchema),
@@ -33,24 +36,31 @@ export function RankingListView(ranking: Ranking) {
   const { mutateAsync: addPersonToRanking } = useMutationAddPersonToRanking(queryClient)
   const { mutateAsync: deletePersonFromRanking } = useMutationDeletePersonFromRanking(queryClient)
 
-  async function handleAddNewPerson(data: PersonFormSchema) {
+  async function handleAddNewPerson(dataParsed: PersonFormSchema) {
     await addPersonToRanking({
-      ranking,
-      player: { id: data.person.id, name: data.person.name },
+      ranking: data,
+      player: { id: dataParsed.person.id, name: dataParsed.person.name },
     })
 
     personForm.reset()
   }
 
   async function handleDeletePerson(id: string) {
-    await deletePersonFromRanking({ ranking, playerId: id })
+    await deletePersonFromRanking({ ranking: data, playerId: id })
   }
 
   return (
     <FormProvider {...personForm}>
-      <div className="space-y-4">
-        <Header data={ranking} onSubmit={handleSubmit(handleAddNewPerson)} />
-        <RankingListPlayerTable initialData={ranking} onDelete={handleDeletePerson} />
+      <div className="space-y-4 p-4">
+        <Header data={data} onSubmit={handleSubmit(handleAddNewPerson)} />
+        <RankingListPlayerTable
+          allData={allData}
+          hasNextPage={hasNextPage}
+          isPending={isPending}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          onDelete={handleDeletePerson}
+        />
       </div>
     </FormProvider>
   )

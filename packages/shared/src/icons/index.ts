@@ -19,5 +19,3 @@ export {
   MailIcon,
   ChevronLeftIcon,
 } from 'lucide-react'
-
-export * as FaIcons from 'react-icons/fa'

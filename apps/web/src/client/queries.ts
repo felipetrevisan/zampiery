@@ -12,11 +12,27 @@ export const getSettingsQuery = groq`
 `
 
 export const getPlayersQuery = groq`
-  *[ _type == 'player' ] { 
+  *[_type == "player"] {
     "id": _id,
     name,
     favoritePosition,
     favoriteTeam
+  }
+`
+
+export const getPaginatedPlayersQuery = groq`
+  {
+    "data": *[_type == "player"][$offset...$offset + $pageSize] {
+      "id": _id,
+      name,
+      favoritePosition,
+      favoriteTeam
+    },
+    "total": count(*[_type == "player"]),
+    "page": (($offset - ($offset % $pageSize)) / $pageSize) + 1,
+    "pageSize": $pageSize,
+    "nextOffset": $offset + $pageSize,
+    "hasNextPage": ($offset + $pageSize) < count(*[_type == "player"])
   }
 `
 
@@ -29,6 +45,22 @@ export const getRankingListsQuery = groq`
   }
 `
 
+export const getPaginatedRankingListsQuery = groq`
+  {
+    "data": *[_type == "ranking-list"][$offset...$offset + $pageSize] {
+      "id": _id,
+      title,
+      "slug": slug.current,
+      "playersCount": count(players)
+    },
+    "total": count(*[_type == "ranking-list"]),
+    "page": (($offset - ($offset % $pageSize)) / $pageSize) + 1,
+    "pageSize": $pageSize,
+    "nextOffset": $offset + $pageSize,
+    "hasNextPage": ($offset + $pageSize) < count(*[_type == "ranking-list"])
+  }
+`
+
 export const getRankingListBySlugQuery = groq`
   *[_type == "ranking-list" && slug.current == $slug][0] {
     "id": _id,
@@ -37,6 +69,23 @@ export const getRankingListBySlugQuery = groq`
     "players": players[]->{
       "id": _id,
       name
+    }
+  }
+`
+
+export const getPaginatedRankingListBySlugQuery = groq`
+  *[_type == "ranking-list" && slug.current == $slug][0] {
+    "id": _id,
+    title,
+    "slug": slug.current,
+    "total": count(players[]),
+    "pageSize": $pageSize,
+    "page": (($offset - ($offset % $pageSize)) / $pageSize) + 1,
+    "nextOffset": $offset + $pageSize,
+    "hasNextPage": ($offset + $pageSize) < count(players[]),
+    "data": players[$offset...($offset + $pageSize)][]-> {
+      "id": _id,
+      name,
     }
   }
 `

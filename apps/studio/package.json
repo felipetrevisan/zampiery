@@ -24,7 +24,6 @@
     "@sanity/vision": "^3.99.0",
     "react": "^19.1",
     "react-dom": "^19.1",
-    "react-icons": "^5.0.1",
     "sanity": "^3.99.0",
     "styled-components": "^6.1.18",
     "tailwind-clamp": "4.0.13",

@@ -31,7 +31,7 @@ export default async function AppLayout({
         </div>
         <main>
           <Background />
-          <div className="relative z-10 mx-4 my-10">{children}</div>
+          <div className="relative z-10 mx-4 mb-10">{children}</div>
         </main>
         {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" className="hidden">

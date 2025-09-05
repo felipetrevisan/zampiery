@@ -1,19 +1,17 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  useMutationCreatePlayer,
+  useMutationDeletePlayer,
+  useMutationUpdatePlayer,
+} from '@nathy/web/hooks/mutations/player'
+import { usePaginatedPlayer } from '@nathy/web/hooks/use-player'
+import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
+import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-
-import { useMutationCreatePlayer, useMutationDeletePlayer, useMutationUpdatePlayer } from '@nathy/web/hooks/mutations/player'
-import {
-  mutateCreatePlayer,
-  mutateDeletePlayer,
-  mutateUpdatePlayer,
-} from '@nathy/web/server/player'
-import type { Player } from '@nathy/web/types/player'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { Header } from './header'
 import { PlayersTable } from './players-table'
 
@@ -25,10 +23,17 @@ const playerFormSchema = z.object({
 
 export type PlayerFormSchema = z.infer<typeof playerFormSchema>
 
-export function PlayersList() {
+export function PlayersList({ data }: { data: PaginatedPlayers }) {
   const queryClient = useQueryClient()
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const {
+    allPlayers,
+    hasNextPage,
+    isPending,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = usePaginatedPlayer(data)
 
   const playerForm = useForm<PlayerFormSchema>({
     resolver: zodResolver(playerFormSchema),
@@ -57,7 +62,7 @@ export function PlayersList() {
 
   return (
     <FormProvider {...playerForm}>
-      <div className="space-y-4">
+      <div className="space-y-4 p-4">
         <Header
           onSubmit={handleSubmit(handleAddNewPlayer)}
           onEdit={handleSubmit(handleEditPlayer)}
@@ -65,11 +70,17 @@ export function PlayersList() {
           onSelectPlayer={setSelectedPlayer}
           dialogOpen={isDialogOpen}
           selectedPlayer={selectedPlayer}
+          playersTotalCount={allPlayers.length}
         />
         <PlayersTable
           onDelete={handleDeletePlayer}
           onDialogOpen={setIsDialogOpen}
           onSelectPlayer={setSelectedPlayer}
+          allPlayers={allPlayers}
+          hasNextPage={hasNextPage}
+          isPending={isPending}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
         />
       </div>
     </FormProvider>

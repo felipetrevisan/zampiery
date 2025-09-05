@@ -1,7 +1,5 @@
 'use client'
 
-import * as React from 'react'
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -22,11 +20,15 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from '@nathy/shared/ui/animated/sidebar'
-import { ChevronRight, ChevronsUpDown, Command, ListFilter } from 'lucide-react'
+import { Badge } from '@nathy/shared/ui/badge'
+import { ChevronRight, ChevronsUpDown, Command, ListFilter, UsersIcon } from 'lucide-react'
 import Link from 'next/link'
+import * as React from 'react'
 import { useGroupedList } from '../hooks/use-grouped-list'
+import { usePlayer } from '../hooks/use-player'
 import { useRankingList } from '../hooks/use-ranking'
 import { useSettings } from '../hooks/use-settings'
+import type { SidebarItem } from '../types/sidebar'
 
 const DATA = {
   teams: [
@@ -63,38 +65,27 @@ const DATA = {
       title: 'Listas',
       url: '#',
       icon: ListFilter,
-      actions: [
-        {
-          id: 'add',
-          title: 'Nova Lista',
-          callback: () => null,
-        },
-      ],
       items: [],
     },
     {
       title: 'Jogadores',
       url: '/players',
-      icon: ListFilter,
-      actions: [],
-      items: [
-        {
-          title: 'Todos os Jogadores',
-          url: '/players',
-        },
-      ],
+      icon: UsersIcon,
+      items: [],
     },
   ],
-}
+} satisfies SidebarItem
 
 export function Sidebar() {
   const [activeTeam, setActiveTeam] = React.useState(DATA.teams[0])
   const { data: rankingLists } = useRankingList([])
   const { data: groupedLists } = useGroupedList()
+  const { data: players } = usePlayer([])
   const { data: settings } = useSettings()
 
   if (!activeTeam) return null
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   React.useEffect(() => {
     if (settings) {
       setActiveTeam({
@@ -108,27 +99,49 @@ export function Sidebar() {
     rankingLists?.map((list) => ({
       title: list.title,
       url: `/ranking/${list.slug}`,
+      total: list.playersCount,
+      showBadge: true,
     })) ?? []
 
   const dynamicGroupedLists =
     groupedLists?.map((list) => ({
       title: list.title,
       url: `/list/${list.slug}`,
+      total: 0,
+      showBadge: false,
     })) ?? []
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
   const nav = React.useMemo(() => {
     return DATA.navMain.map((item) => {
       if (item.title === 'Ranking') {
         return {
           ...item,
-          items: [...dynamicRankingLists, { title: 'Todas as Listas', url: '/ranking' }],
+          items: [
+            ...dynamicRankingLists,
+            { title: 'Todas', url: '/ranking', total: 0, showBadge: false },
+          ],
         }
       }
 
       if (item.title === 'Listas') {
         return {
           ...item,
-          items: [...dynamicGroupedLists, { title: 'Todas as Listas', url: '/list' }],
+          items: [
+            ...dynamicGroupedLists,
+            { title: 'Todas', url: '/list', total: 0, showBadge: false },
+          ],
+        }
+      }
+
+      if (item.title === 'Jogadores') {
+        return {
+          ...item,
+          items: [
+            ...item.items,
+            { title: 'Todos', url: '/players', total: players?.length ?? 0, showBadge: true },
+          ],
         }
       }
 
@@ -187,9 +200,28 @@ export function Sidebar() {
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </Link>
+                            {subItem.url ? (
+                              <Link
+                                href={subItem.url}
+                                className="flex w-full items-center justify-between"
+                              >
+                                <span>{subItem.title}</span>
+                                {subItem?.showBadge && (
+                                  <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
+                                    {subItem.total}
+                                  </Badge>
+                                )}
+                              </Link>
+                            ) : (
+                              <>
+                                <span>{subItem.title}</span>
+                                {subItem?.showBadge && (
+                                  <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
+                                    {subItem.total}
+                                  </Badge>
+                                )}
+                              </>
+                            )}
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}

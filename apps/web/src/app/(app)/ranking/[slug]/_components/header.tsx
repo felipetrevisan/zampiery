@@ -11,18 +11,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@nathy/shared/ui/animated/dialog'
-import { CountingNumber } from '@nathy/shared/ui/animated/text/counting-number'
 import { Button } from '@nathy/shared/ui/button'
 import { ComboboxField } from '@nathy/shared/ui/combobox'
 import { Separator } from '@nathy/shared/ui/separator'
+import { BaseHeader } from '@nathy/web/components/base-header'
 import { usePlayer } from '@nathy/web/hooks/use-player'
-import type { Ranking } from '@nathy/web/types/ranking'
+import type { PaginatedSingleRanking } from '@nathy/web/types/ranking'
 import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 interface HeaderProps {
-  data: Ranking
+  data: PaginatedSingleRanking
   onSubmit: () => void
 }
 
@@ -32,7 +32,7 @@ export function Header({ data, onSubmit }: HeaderProps) {
     formState: { isSubmitting, isValid },
   } = useFormContext()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const { data: players, isLoading: loadingPlayers } = usePlayer()
+  const { data: players, isLoading: loadingPlayers } = usePlayer([])
 
   function handleSubmit() {
     onSubmit()
@@ -40,16 +40,7 @@ export function Header({ data, onSubmit }: HeaderProps) {
   }
 
   return (
-    <div className="flex items-center justify-between">
-      <h2 className="flex items-center gap-2 font-bold text-2xl text-primary tracking-tight">
-        {data.title}
-        <CountingNumber
-          className='w-[50px] rounded-full border-1 border-primary/30 p-2 text-center text-primary shadow-md shadow-primary/10'
-          number={data?.players.length ?? 0}
-          fromNumber={0}
-        />
-      </h2>
-
+    <BaseHeader title={data.title} showTotalCount totalCount={data.total ?? 0}>
       <div className="flex items-center gap-2">
         <Separator orientation="vertical" className="h-6" />
 
@@ -99,6 +90,6 @@ export function Header({ data, onSubmit }: HeaderProps) {
           </form>
         </Dialog>
       </div>
-    </div>
+    </BaseHeader>
   )
 }

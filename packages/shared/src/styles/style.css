@@ -17,6 +17,7 @@
 
   --font-russo: var(--font-russo);
   --font-inter: var(--font-inter);
+  --font-nixie: var(--font-nixie);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -167,8 +168,8 @@
   --secondary: oklch(28.138% 0.14234 296.163);
   --secondary-foreground: oklch(98.5% 0 0);
 
-  --accent: oklch(37.1% 0 0);
-  --accent-foreground: oklch(98.5% 0 0);
+  --accent: oklch(0% 0 0);
+  --accent-foreground: oklch(78.658% 0.10767 310.325);
   
   --destructive: oklch(70.4% 0.191 22.216);
   --destructive-foreground: oklch(98.5% 0 0);

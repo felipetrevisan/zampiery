@@ -28,8 +28,8 @@ export function PlayerRowSkeleton() {
         </div>
 
         <div className="flex gap-2">
-          <Skeleton className="h-8 w-8 rounded-md bg-primary/50" />
-          <Skeleton className="h-8 w-8 rounded-md bg-primary/50" />
+          <Skeleton className="h-8 w-8 rounded-full bg-primary/50" />
+          <Skeleton className="h-8 w-8 rounded-full bg-primary/50" />
         </div>
       </div>
     </motion.div>

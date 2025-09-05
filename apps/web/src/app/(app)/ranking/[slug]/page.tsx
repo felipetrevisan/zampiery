@@ -1,4 +1,4 @@
-import { getRankingList, getRankingListBySlug } from '@nathy/web/server/ranking'
+import { getPaginatedRankingListBySlug, getRankingList, getRankingListBySlug } from '@nathy/web/server/ranking'
 import { RankingListView } from './_components'
 
 interface PageProps {
@@ -10,9 +10,11 @@ export const dynamic = 'force-dynamic'
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
 
-  const data = await getRankingListBySlug(slug)
+  const data = await getPaginatedRankingListBySlug({ offset: 0, pageSize: 10, slug })
 
-  return <RankingListView {...data} />
+  console.log(data)
+
+  return <RankingListView data={data} />
 }
 
 export async function generateStaticParams() {

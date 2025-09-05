@@ -30,7 +30,7 @@ interface HeaderProps {
 }
 
 export function Header({ onSubmit, onDialogOpen, dialogOpen, list }: HeaderProps) {
-  const { data, isLoading } = usePlayer()
+  const { data, isLoading } = usePlayer([])
   const [open, setOpen] = useState(false)
 
   const {

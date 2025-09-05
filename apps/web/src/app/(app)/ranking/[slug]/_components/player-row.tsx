@@ -34,12 +34,12 @@ export function PlayerRow({ player, index, onDelete }: RowProps) {
           index === 2 && 'from-orange-400/20',
         )}
       >
-        <span className='relative z-10 px-4 font-extrabold font-russo text-5xl text-primary group-hover:text-primary-foreground dark:text-foreground'>
+        <span className='relative z-10 px-4 font-extrabold font-russo text-5xl text-accent-foreground'>
           {formatOrdinals(index + 1)}
         </span>
       </div>
       <div className="flex items-center justify-between space-x-4 px-20 py-4">
-        <div className='w-[300px] flex-1 font-bold text-lg text-primary group-hover:text-primary-foreground dark:text-foreground'>
+        <div className='w-[300px] flex-1 font-bold text-accent-foreground text-xl'>
           {player.name}
         </div>
       </div>

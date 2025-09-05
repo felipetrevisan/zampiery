@@ -1,18 +1,23 @@
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata } from 'next'
-import { Inter, Russo_One } from 'next/font/google'
-import Providers from './providers'
-
+import { Inter, Nixie_One, Russo_One } from 'next/font/google'
 import type { ReactNode } from 'react'
+import Providers from './providers'
 import './styles.css'
 import { Toaster } from '@nathy/shared/ui'
-import { getSettings } from '../server/settings'
+import { getSettings } from '@nathy/web/server/settings'
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['200', '300', '400', '500', '600', '700'],
   variable: '--font-inter',
+})
+
+const nixieOne = Nixie_One({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-nixie',
 })
 
 const russo = Russo_One({
@@ -43,10 +48,13 @@ export default async function RootLayoutt({ children }: Props) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${russo.variable}`}
+      className={`${inter.variable} ${russo.variable} ${nixieOne.variable}`}
       suppressHydrationWarning
     >
-      <body className="flex h-full flex-col overflow-x-hidden antialiased" data-theme={settings.theme.color}>
+      <body
+        className="flex h-full flex-col overflow-x-hidden antialiased"
+        data-theme={settings.theme.color}
+      >
         <Providers>
           {children}
           <Toaster />

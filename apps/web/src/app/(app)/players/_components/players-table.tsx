@@ -1,38 +1,83 @@
 'use client'
 
-import { Avatar, AvatarFallback } from '@nathy/shared/ui/avatar'
-import { Toolbar, ToolbarButton } from '@nathy/web/components/toolbar'
-import { usePlayer } from '@nathy/web/hooks/use-player'
 import { useTeam } from '@nathy/web/hooks/use-team'
-import { type Player, PlayerPositionLabels } from '@nathy/web/types/player'
-import { PencilIcon, Trash } from 'lucide-react'
+import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
+import type {
+  FetchNextPageOptions,
+  InfiniteData,
+  InfiniteQueryObserverResult,
+} from '@tanstack/react-query'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ConfirmDeleteAlert } from './confirm-delete'
 import { LoadingPlayers } from './loading-players'
 import { PlayerRow } from './player-row'
+import { PlayerRowSkeleton } from './player-row-skeleton'
 
 interface TableProps {
   onDelete: (id: string) => void
   onSelectPlayer: (player: Player | null) => void
   onDialogOpen: (state: boolean) => void
+  allPlayers: Player[]
+  hasNextPage: boolean
+  isPending: boolean
+  isFetchingNextPage: boolean
+  fetchNextPage: (
+    options?: FetchNextPageOptions | undefined,
+  ) => Promise<InfiniteQueryObserverResult<InfiniteData<PaginatedPlayers, unknown>, Error>>
 }
 
-export function PlayersTable({ onDelete, onDialogOpen, onSelectPlayer }: TableProps) {
-  const { data, isLoading, isPending } = usePlayer()
+export function PlayersTable({
+  allPlayers,
+  hasNextPage,
+  isPending,
+  isFetchingNextPage,
+  fetchNextPage,
+  onDelete,
+  onDialogOpen,
+  onSelectPlayer,
+}: TableProps) {
   const { data: teams } = useTeam()
   const [deleteId, setDeleteId] = useState<string | null>(null)
+
+  const parentRef = useRef<HTMLDivElement | null>(null)
+  const loaderRef = useRef<HTMLDivElement | null>(null)
+
+  const rowVirtualizer = useVirtualizer({
+    count: hasNextPage ? allPlayers?.length + 1 : allPlayers?.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 102 * 1.06,
+    overscan: 5,
+    getItemKey: (index) => allPlayers[index]?.id ?? `loader-${index}`,
+    measureElement: (el) => el.getBoundingClientRect().height,
+  })
 
   function openEditDialog(player: Player) {
     onSelectPlayer(player)
     onDialogOpen(true)
   }
 
+  useEffect(() => {
+    if (!loaderRef.current || !parentRef.current) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const ent = entries[0]
+        if (ent.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { root: parentRef.current, rootMargin: '200px' },
+    )
+    obs.observe(loaderRef.current)
+    return () => obs.disconnect()
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+
   return (
     <div className="space-y-2">
-      {isLoading ? (
+      {isPending ? (
         <LoadingPlayers />
-      ) : !isPending && !data?.length ? (
+      ) : !allPlayers?.length ? (
         <div className="group space-y-6 rounded-2xl border border-primary/20 bg-neutral-200/80 p-3 backdrop-blur-2xl dark:bg-neutral-900/80">
           <div className="p-10">
             <div className="flex items-center justify-center space-x-2 text-muted-foreground group-hover:text-primary-foreground">
@@ -41,18 +86,77 @@ export function PlayersTable({ onDelete, onDialogOpen, onSelectPlayer }: TablePr
           </div>
         </div>
       ) : (
-        <>
-          {data?.map((player) => (
-            <PlayerRow
-              key={player.id}
-              player={player}
-              teams={teams?.teams ?? []}
-              onEdit={openEditDialog}
-              onDelete={setDeleteId}
+        <div ref={parentRef} className="h-[700px] overflow-visible">
+          <div
+            style={{
+              height: rowVirtualizer.getTotalSize(),
+              position: 'relative',
+              width: '100%',
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const isLoader = virtualRow.index === allPlayers.length
+              const player = allPlayers[virtualRow.index]
+
+              if (isLoader) {
+                if (hasNextPage && !isFetchingNextPage) {
+                  fetchNextPage()
+                }
+
+                return (
+                  <div
+                    key={`loader-${virtualRow.index}`}
+                    ref={loaderRef}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      transform: `translateY(${virtualRow.start}px)`,
+                      height: virtualRow.size,
+                      width: '100%',
+                    }}
+                  >
+                    <PlayerRowSkeleton />
+                  </div>
+                )
+              }
+
+              return (
+                <div
+                  key={player.id}
+                  ref={rowVirtualizer.measureElement}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    transform: `translateY(${virtualRow.start}px)`,
+                    height: `${virtualRow.size}px`,
+                    width: '100%',
+                  }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 1.01 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                    className="group relative flex flex-grow overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:bg-primary/80 dark:bg-neutral-900/80"
+                  >
+                    <PlayerRow
+                      player={player}
+                      teams={teams?.teams ?? []}
+                      onEdit={openEditDialog}
+                      onDelete={setDeleteId}
+                    />
+                  </motion.div>
+                </div>
+              )
+            })}
+            <ConfirmDeleteAlert
+              deleteId={deleteId}
+              onSetDeleteId={setDeleteId}
+              onDelete={onDelete}
             />
-          ))}
-          <ConfirmDeleteAlert deleteId={deleteId} onSetDeleteId={setDeleteId} onDelete={onDelete} />
-        </>
+          </div>
+        </div>
       )}
     </div>
   )

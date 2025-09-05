@@ -11,9 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@nathy/shared/ui/animated/dialog'
-import { CountingNumber } from '@nathy/shared/ui/animated/text/counting-number'
 import { Button } from '@nathy/shared/ui/button'
 import { Separator } from '@nathy/shared/ui/separator'
+import { BaseHeader } from '@nathy/web/components/base-header'
 import type { Ranking } from '@nathy/web/types/ranking'
 import { Loader2Icon } from 'lucide-react'
 import { useEffect } from 'react'
@@ -26,7 +26,7 @@ interface HeaderProps {
   onDialogOpen: (state: boolean) => void
   selectedList: Ranking | null
   dialogOpen: boolean
-  rankingLists: Ranking[]
+  rankingListTotalCount: number
 }
 
 export function Header({
@@ -36,12 +36,12 @@ export function Header({
   onSelectList,
   dialogOpen,
   selectedList,
-  rankingLists
+  rankingListTotalCount = 0,
 }: HeaderProps) {
   const {
     register,
     reset,
-    formState: { isSubmitting, isValid, errors },
+    formState: { isSubmitting, isValid },
   } = useFormContext()
 
   function handleSubmit() {
@@ -67,16 +67,7 @@ export function Header({
   }, [selectedList, reset])
 
   return (
-    <div className="flex items-center justify-between">
-      <h2 className="flex items-center gap-2 font-bold text-2xl text-primary tracking-tight">
-        Listas de Ranking
-        <CountingNumber
-          className="w-[50px] rounded-full border-1 border-primary/30 p-2 text-center text-primary shadow-md shadow-primary/10"
-          number={rankingLists?.length ?? 0}
-          fromNumber={0}
-        />
-      </h2>
-
+    <BaseHeader title="Listas de Ranking" showTotalCount totalCount={rankingListTotalCount}>
       <div className="flex items-center gap-2">
         <Separator orientation="vertical" className="h-6" />
 
@@ -123,6 +114,6 @@ export function Header({
           </form>
         </Dialog>
       </div>
-    </div>
+    </BaseHeader>
   )
 }

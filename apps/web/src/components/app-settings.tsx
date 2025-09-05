@@ -82,7 +82,7 @@ export function AppSettingsSheet({ side }: AppSettingsSheetProps) {
 
   return (
     <FormProvider {...settingsform}>
-      <SheetContent side={side}>
+      <SheetContent side={side} >
         <SheetHeader>
           <SheetTitle>Configurações</SheetTitle>
         </SheetHeader>

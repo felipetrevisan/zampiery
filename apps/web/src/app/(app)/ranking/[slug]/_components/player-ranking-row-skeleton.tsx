@@ -3,7 +3,7 @@
 import { Skeleton } from '@nathy/shared/ui'
 import { motion } from 'motion/react'
 
-export function PlayerRowSkeleton() {
+export function PlayerRankingRowSkeleton() {
   return (
     <motion.div
       className='group relative flex flex-grow overflow-hidden rounded-2xl border border-primary/20 bg-neutral-200/80 p-3 backdrop-blur-2xl dark:bg-neutral-900/80'
