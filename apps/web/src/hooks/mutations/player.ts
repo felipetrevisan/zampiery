@@ -4,7 +4,6 @@ import {
   mutateUpdatePlayer,
 } from '@nathy/web/server/player'
 import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
-import type { Ranking } from '@nathy/web/types/ranking'
 import { type InfiniteData, type QueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { v4 } from 'uuid'

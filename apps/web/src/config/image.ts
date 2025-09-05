@@ -1,4 +1,4 @@
-import { getImageUrlBuilder } from '@nathy/shared/sanity/image'
+import { getImageUrlBuilder } from '@nathy/shared/lib/image'
 import { env } from '@nathy/web/config/env'
 
 const { urlForImage, resolveOpenGraphImage } = getImageUrlBuilder({
