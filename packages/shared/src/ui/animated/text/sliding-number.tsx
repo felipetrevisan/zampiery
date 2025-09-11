@@ -36,7 +36,7 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: SlidingNum
     <span
       ref={measureRef}
       data-slot="sliding-number-roller"
-      className='relative inline-block w-[1ch] overflow-y-clip overflow-x-visible tabular-nums leading-none'
+      className="relative inline-block w-[1ch] overflow-y-clip overflow-x-visible tabular-nums leading-none"
     >
       <span className="invisible">0</span>
       {Array.from({ length: 10 }, (_, i) => (
@@ -174,9 +174,7 @@ function SlidingNumber({
   const decPlaces = React.useMemo(
     () =>
       newDecStrRaw
-        ? Array.from({ length: newDecStrRaw.length }, (_, i) =>
-            10 ** (newDecStrRaw.length - i - 1),
-          )
+        ? Array.from({ length: newDecStrRaw.length }, (_, i) => 10 ** (newDecStrRaw.length - i - 1))
         : [],
     [newDecStrRaw],
   )

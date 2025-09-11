@@ -7,8 +7,7 @@ const writeClient = client.withConfig({
 })
 
 async function fixDocRank(docId: string) {
-  await writeClient
-    .delete(docId)
+  await writeClient.delete(docId)
   console.log(`Documento ${docId} corrigido!`)
 }
 

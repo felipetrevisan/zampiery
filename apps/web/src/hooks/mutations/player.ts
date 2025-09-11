@@ -8,55 +8,13 @@ import { type InfiniteData, type QueryClient, useMutation } from '@tanstack/reac
 import { toast } from 'sonner'
 import { v4 } from 'uuid'
 
-// export const useMutationCreatePlayer = (queryClient: QueryClient) =>
-//   useMutation({
-//     mutationFn: (data: Omit<Player, 'id'>) => mutateCreatePlayer(data),
-//     onMutate: async ({ name, favoritePosition, favoriteTeam }) => {
-//       await queryClient.cancelQueries({ queryKey: ['players'] })
-//       const previousPlayer = queryClient.getQueryData<Player[]>(['players'])
-
-//       if (!previousPlayer) return { previousPlayer }
-
-//       const optimisticPlayer = {
-//         id: v4(),
-//         name,
-//         favoritePosition,
-//         favoriteTeam,
-//       } satisfies Player
-
-//       queryClient.setQueryData<Player[]>(['players'], (oldPlayer) => {
-//         if (!oldPlayer) return []
-//         return [...oldPlayer, optimisticPlayer]
-//       })
-
-//       return { previousPlayer, optimisticId: optimisticPlayer.id }
-//     },
-//     onError: (_err, _variables, context) => {
-//       if (context?.previousPlayer) {
-//         queryClient.setQueryData(['players'], context.previousPlayer)
-//       }
-//       toast.error('Erro ao criar novo jogador')
-//     },
-//     onSuccess: (createdPlayer, _variables, context) => {
-//       queryClient.setQueryData<Player[]>(['players'], (oldPlayer) => {
-//         if (!oldPlayer) return oldPlayer
-
-//         if (!oldPlayer) return []
-
-//         return oldPlayer.map((player) =>
-//           player.id === context?.optimisticId ? { ...player, ...createdPlayer } : player,
-//         )
-//       })
-
-//       toast.success('Jogador criado com sucesso')
-//     },
-//   })
 export const useMutationCreatePlayer = (queryClient: QueryClient) =>
   useMutation({
     mutationFn: (data: Omit<Player, 'id'>) => mutateCreatePlayer(data),
 
     onMutate: async ({ name, favoritePosition, favoriteTeam }) => {
       await queryClient.cancelQueries({ queryKey: ['players-paginated'] })
+      await queryClient.cancelQueries({ queryKey: ['players'] })
 
       // Pega todas as páginas atuais do infinite query
       const previousDataPaginated = queryClient.getQueryData<{ pages: PaginatedPlayers[] }>([
@@ -94,7 +52,6 @@ export const useMutationCreatePlayer = (queryClient: QueryClient) =>
 
       return { previousData, previousDataPaginated, optimisticId: optimisticPlayer.id }
     },
-
     onError: (_err, _variables, context) => {
       if (context?.previousDataPaginated) {
         queryClient.setQueryData(['players-paginated'], context.previousDataPaginated)
@@ -103,11 +60,10 @@ export const useMutationCreatePlayer = (queryClient: QueryClient) =>
       if (context?.previousData) {
         queryClient.setQueryData(['players'], context.previousData)
       }
-      toast.error('Erro ao criar novo jogador')
+      toast.error('Não foi possível criar novo jogador no momento.')
     },
-
     onSuccess: (_createdPlayer, _variables, _context) => {
-      toast.success('Jogador criado com sucesso')
+      toast.success('Jogador foi criado com sucesso')
     },
   })
 
@@ -117,13 +73,16 @@ export const useMutationUpdatePlayer = (queryClient: QueryClient) =>
       mutateUpdatePlayer(id, data),
     onMutate: async ({ data, id }) => {
       await queryClient.cancelQueries({ queryKey: ['players-paginated'] })
+      await queryClient.cancelQueries({ queryKey: ['players'] })
 
       // Pega todas as páginas atuais do infinite query
-      const previousData = queryClient.getQueryData<{ pages: PaginatedPlayers[] }>([
+      const previousDataPaginated = queryClient.getQueryData<{ pages: PaginatedPlayers[] }>([
         'players-paginated',
       ])
 
-      if (!previousData) return { previousData }
+      const previousData = queryClient.getQueryData<Player[]>(['players'])
+
+      if (!previousDataPaginated) return { previousDataPaginated }
 
       const optimisticUpdatedPlayer: Omit<Player, 'id'> = {
         name: data.name,
@@ -133,29 +92,41 @@ export const useMutationUpdatePlayer = (queryClient: QueryClient) =>
 
       queryClient.setQueryData<{ pages: PaginatedPlayers[] }>(['players-paginated'], (old) => {
         if (!old) return old
+
         return {
           ...old,
           pages: old.pages.map((page) => ({
             ...page,
             data: page.data.map((player) =>
-              player.id === id
-                ? { ...player, ...optimisticUpdatedPlayer } // substitui pelos novos dados
-                : player,
+              player.id === id ? { ...player, ...optimisticUpdatedPlayer } : player,
             ),
           })),
         }
       })
 
-      return { previousData }
+      queryClient.setQueryData<Player[]>(['players'], (old) => {
+        if (!old) return old
+
+        return old.map((player) =>
+          player.id === id ? { ...player, ...optimisticUpdatedPlayer } : player,
+        )
+      })
+
+      return { previousDataPaginated, previousData }
     },
     onError: (_err, _variables, context) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(['players-paginated'], context.previousData)
+      if (context?.previousDataPaginated) {
+        queryClient.setQueryData(['players-paginated'], context.previousDataPaginated)
       }
-      toast.error('Erro ao atualizar o jogador')
+
+      if (context?.previousData) {
+        queryClient.setQueryData(['players'], context.previousData)
+      }
+
+      toast.error('Não foi possível atualizar o jogador no momento.')
     },
     onSuccess: (_updatedPlayer) => {
-      toast.success('Jogador atualizado com sucesso')
+      toast.success('Jogador foi atualizado com sucesso')
     },
   })
 
@@ -164,9 +135,12 @@ export const useMutationDeletePlayer = (queryClient: QueryClient) =>
     mutationFn: (id: string) => mutateDeletePlayer(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ['players-paginated'] })
+      await queryClient.cancelQueries({ queryKey: ['players'] })
+
       const previousDataPaginated = queryClient.getQueryData<PaginatedPlayers[]>([
         'players-paginated',
       ])
+
       const previousData = queryClient.getQueryData<Player[]>(['players'])
 
       if (!previousDataPaginated) return { previousDataPaginated }
@@ -179,7 +153,7 @@ export const useMutationDeletePlayer = (queryClient: QueryClient) =>
           pages: old.pages.map((page) => ({
             ...page,
             data: page.data.filter((player) => player.id !== id),
-            total: page.total - 1, // opcional: decrementa o total
+            total: page.total - 1,
           })),
         }
       })
@@ -199,7 +173,9 @@ export const useMutationDeletePlayer = (queryClient: QueryClient) =>
       if (context?.previousData) {
         queryClient.setQueryData(['players'], context.previousData)
       }
-      toast.error('Erro ao deletar o jogador')
+      toast.error(
+        'Erro ao deletar o jogador. Ele pode estar associado em alguma lista. Verifique e tente novamente.',
+      )
     },
     onSuccess: (_updatedPlayer) => {
       toast.success('Jogador deletado com sucesso')

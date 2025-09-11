@@ -19,7 +19,8 @@ const themes = {
     'bg-linear-to-r from-secondary via-secondary/80 to-secondary hover:bg-secondary/30 hover:text-secondary-foreground text-secondary-foreground outline-secondary-foreground/40',
   tertiary:
     'bg-linear-to-r from-tertiary via-tertiary/80 to-tertiary text-tertiary-foreground hover:bg-tertiary/30 hover:text-tertiary-foreground outline-tertiary/40 hover:border-tertiary/40',
-  custom: 'bg-linear-to-r from-[var(--header-button-hover-background)] via-[var(--header-button-hover-background)]/80 to-[var(--header-button-hover-background)] text-[var(--header-button-hover-text)] hover:bg-[var(--header-button-hover-background)]/30 hover:text-[var(--header-button-hover-text)] outline-[var(--header-button-hover-background)]/40 hover:border-[var(--header-button-hover-background)]/40',
+  custom:
+    'bg-linear-to-r from-[var(--header-button-hover-background)] via-[var(--header-button-hover-background)]/80 to-[var(--header-button-hover-background)] text-[var(--header-button-hover-text)] hover:bg-[var(--header-button-hover-background)]/30 hover:text-[var(--header-button-hover-text)] outline-[var(--header-button-hover-background)]/40 hover:border-[var(--header-button-hover-background)]/40',
 }
 
 type IconButtonProps = Omit<HTMLMotionProps<'button'>, 'color'> & {

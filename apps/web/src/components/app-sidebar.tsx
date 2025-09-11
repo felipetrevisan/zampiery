@@ -99,7 +99,7 @@ export function Sidebar() {
     rankingLists?.map((list) => ({
       title: list.title,
       url: `/ranking/${list.slug}`,
-      total: list.playersCount,
+      total: list.total,
       showBadge: true,
     })) ?? []
 
@@ -157,8 +157,8 @@ export function Sidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
-                  size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar"
+                  size="lg"
                 >
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar text-sidebar-foreground">
                     <activeTeam.logo className="size-4" />
@@ -182,10 +182,10 @@ export function Sidebar() {
           <SidebarMenu>
             {nav.map((item) => (
               <Collapsible
-                key={item.title}
                 asChild
-                defaultOpen={false}
                 className="group/collapsible"
+                defaultOpen={false}
+                key={item.title}
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
@@ -202,8 +202,8 @@ export function Sidebar() {
                           <SidebarMenuSubButton asChild>
                             {subItem.url ? (
                               <Link
-                                href={subItem.url}
                                 className="flex w-full items-center justify-between"
+                                href={subItem.url}
                               >
                                 <span>{subItem.title}</span>
                                 {subItem?.showBadge && (

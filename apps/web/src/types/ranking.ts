@@ -14,7 +14,7 @@ export type Ranking = {
   title: string
   slug: string
   players: Player[]
-  playersCount?: number
+  total?: number
 }
 
 export type PaginatedSingleRanking = {

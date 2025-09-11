@@ -123,7 +123,7 @@ function HoleBackground({
     }
     // biome-ignore lint/complexity/noForEach: <explanation>
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        stateRef.current.discs.forEach((disc: any) => {
+    stateRef.current.discs.forEach((disc: any) => {
       for (let i = 0; i < numberOfLines; i++) {
         const angle = i * linesAngle
         const p = {
@@ -141,7 +141,7 @@ function HoleBackground({
     if (!ctx) return
     // biome-ignore lint/complexity/noForEach: <explanation>
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        stateRef.current.lines.forEach((line: any) => {
+    stateRef.current.lines.forEach((line: any) => {
       ctx.save()
       let lineIsIn = false
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -250,7 +250,7 @@ function HoleBackground({
     ctx.clip(stateRef.current.clip.path)
     // biome-ignore lint/complexity/noForEach: <explanation>
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        stateRef.current.particles.forEach((particle: any) => {
+    stateRef.current.particles.forEach((particle: any) => {
       ctx.fillStyle = particle.c
       ctx.beginPath()
       ctx.rect(particle.x, particle.y, particle.r, particle.r)
@@ -263,7 +263,7 @@ function HoleBackground({
   const moveDiscs = React.useCallback(() => {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     // biome-ignore lint/complexity/noForEach: <explanation>
-        stateRef.current.discs.forEach((disc: any) => {
+    stateRef.current.discs.forEach((disc: any) => {
       disc.p = (disc.p + 0.001) % 1
       tweenDisc(disc)
     })
@@ -337,7 +337,7 @@ function HoleBackground({
       {children}
       <canvas
         ref={canvasRef}
-        className='absolute inset-0 block size-full opacity-10 dark:opacity-20'
+        className="absolute inset-0 block size-full opacity-10 dark:opacity-20"
       />
       <motion.div
         className={cn(
@@ -347,7 +347,7 @@ function HoleBackground({
         animate={{ backgroundPosition: '0% 300%' }}
         transition={{ duration: 5, ease: 'linear', repeat: Number.POSITIVE_INFINITY }}
       />
-      <div className='absolute top-0 left-0 z-[7] size-full opacity-50 mix-blend-overlay dark:[background:repeating-linear-gradient(transparent,transparent_1px,white_1px,white_2px)]' />
+      <div className="absolute top-0 left-0 z-[7] size-full opacity-50 mix-blend-overlay dark:[background:repeating-linear-gradient(transparent,transparent_1px,white_1px,white_2px)]" />
     </div>
   )
 }

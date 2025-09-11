@@ -141,7 +141,7 @@ function NavigationMenuIndicator({
       )}
       {...props}
     >
-      <div className='relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md' />
+      <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
     </NavigationMenuPrimitive.Indicator>
   )
 }
@@ -167,8 +167,8 @@ function NavigationListItem({
         {...props}
       >
         <div className="flex flex-row items-center gap-2">
-          {LucideIcon && <LucideIcon className='hidden size-6 md:inline-flex' />}
-          <div className='font-medium text-md leading-none'>{title}</div>
+          {LucideIcon && <LucideIcon className="hidden size-6 md:inline-flex" />}
+          <div className="font-medium text-md leading-none">{title}</div>
         </div>
         {children && <p className="line-clamp-1 text-sm leading-snug">{children}</p>}
       </a>

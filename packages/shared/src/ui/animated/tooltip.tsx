@@ -110,7 +110,7 @@ function TooltipContent({
               {arrow && (
                 <TooltipPrimitive.Arrow
                   data-slot="tooltip-content-arrow"
-                  className='z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] bg-primary fill-primary'
+                  className="z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] bg-primary fill-primary"
                 />
               )}
             </motion.div>

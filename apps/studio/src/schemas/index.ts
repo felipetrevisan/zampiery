@@ -15,6 +15,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     rankingDocument,
 
     gameObject,
-    themeObject
+    themeObject,
   ],
 }

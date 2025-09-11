@@ -3,8 +3,9 @@ export type Settings = {
   theme: {
     schema: 'light' | 'dark' | 'system'
     color: keyof typeof ThemeColor
-  },
-  backgroundEffect: boolean
+  }
+  showBackgroundEffect: boolean
+  backgroundEffectType: 'hole' | 'stars'
 }
 
 export enum ThemeColor {
@@ -15,7 +16,7 @@ export enum ThemeColor {
   purple = 'Purple',
   rose = 'Rose',
   orange = 'Orange',
-  teal = 'Teal'
+  teal = 'Teal',
 }
 
 export const ThemeColorLabels: Record<ThemeColor, string> = {

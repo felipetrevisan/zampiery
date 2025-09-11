@@ -38,7 +38,7 @@ export const gameFormSchema = z.object({
       ),
     }),
     guest: z.object({
-       player: z.object({
+      player: z.object({
         id: z.string().min(1, 'O jogador visitante é obrigatório'),
         name: z.string().min(1, 'O jogador visitante é obrigatório'),
       }),

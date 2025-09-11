@@ -1,11 +1,5 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
-import { type VariantProps, cva } from 'class-variance-authority'
-import { PanelLeftIcon } from 'lucide-react'
-import type { Transition } from 'motion/react'
-import * as React from 'react'
-
 import { useIsMobile } from '@nathy/shared/hooks/use-is-mobile'
 import { cn } from '@nathy/shared/lib/utils'
 import {
@@ -29,6 +23,11 @@ import { Button } from '@nathy/shared/ui/button'
 import { Input } from '@nathy/shared/ui/input'
 import { Separator } from '@nathy/shared/ui/separator'
 import { Skeleton } from '@nathy/shared/ui/skeleton'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { PanelLeftIcon } from 'lucide-react'
+import type { Transition } from 'motion/react'
+import * as React from 'react'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -713,7 +712,7 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        'mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-sidebar-border border-l px-2.5 py-0.5',
+        'mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-sidebar-border border-l py-0.5 pl-2.5',
         'group-data-[collapsible=icon]:hidden',
         className,
       )}

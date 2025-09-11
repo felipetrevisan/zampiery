@@ -1,10 +1,10 @@
 'use client'
 
 import {
+  createContext,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
-  createContext,
   useContext,
   useState,
 } from 'react'
@@ -13,23 +13,28 @@ import type { ThemeColor } from '../types/settings'
 type AppContextProps = {
   color: keyof typeof ThemeColor
   setColor: Dispatch<SetStateAction<keyof typeof ThemeColor>>
-  backgroundEffect: boolean
-  setBackgroundEffect: Dispatch<SetStateAction<boolean>>
+  showBackgroundEffect: boolean
+  setShowBackgroundEffect: Dispatch<SetStateAction<boolean>>
+  backgroundEffectType: string
+  setBackgroundEffectType: Dispatch<SetStateAction<string>>
 }
 
 const AppContext = createContext({} as AppContextProps)
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [color, setColor] = useState<keyof typeof ThemeColor>('default')
-  const [backgroundEffect, setBackgroundEffect] = useState(false)
+  const [showBackgroundEffect, setShowBackgroundEffect] = useState(false)
+  const [backgroundEffectType, setBackgroundEffectType] = useState('hole')
 
   return (
     <AppContext.Provider
       value={{
         color,
         setColor,
-        backgroundEffect,
-        setBackgroundEffect,
+        showBackgroundEffect,
+        setShowBackgroundEffect,
+        backgroundEffectType,
+        setBackgroundEffectType,
       }}
     >
       {children}

@@ -18,7 +18,8 @@ const structure = (S: StructureBuilder, context: ConfigContext) =>
       S.listItem().title('Listas de Jogos').icon(ListIcon).child(S.documentTypeList('list')),
       S.divider(),
       ...S.documentTypeListItems().filter(
-        (listItem) => !['player', 'ranking-list', 'list', 'settings'].includes(listItem.getId() || ''),
+        (listItem) =>
+          !['player', 'ranking-list', 'list', 'settings'].includes(listItem.getId() || ''),
       ),
     ])
 

@@ -127,19 +127,14 @@ export default function BlobButton({
   return (
     <button
       type="button"
-      className={cn(
-        buttonVariants({ variant, size, theme, rounded, fullWidth, className }),
-      )}
+      className={cn(buttonVariants({ variant, size, theme, rounded, fullWidth, className }))}
       {...props}
     >
       <span className={cn(buttonTextVariants({ theme }))} data-slot="button-text">
         {children}
       </span>
 
-      <span
-        className={cn(buttonBaseVariants({ theme, rounded }))}
-        data-slot="button-base"
-      />
+      <span className={cn(buttonBaseVariants({ theme, rounded }))} data-slot="button-base" />
 
       <span className={buttonBlobContainerVariants({ rounded })} data-slot="button-blobs">
         <span className="relative block h-full w-full [filter:url(#goo)]">

@@ -15,7 +15,8 @@ export const useMutationUpdateSettings = (queryClient: QueryClient) =>
       const optimisticUpdatedSettings = {
         title: data.title,
         theme: data.theme,
-        backgroundEffect: data.backgroundEffect
+        showBackgroundEffect: data.showBackgroundEffect,
+        backgroundEffectType: data.backgroundEffectType
       } satisfies Settings
 
       queryClient.setQueryData<Settings>(['settings'], (oldSettings) => {

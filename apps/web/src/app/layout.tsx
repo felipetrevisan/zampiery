@@ -47,8 +47,8 @@ export default async function RootLayoutt({ children }: Props) {
 
   return (
     <html
-      lang="en"
       className={`${inter.variable} ${russo.variable} ${nixieOne.variable}`}
+      lang="en"
       suppressHydrationWarning
     >
       <body

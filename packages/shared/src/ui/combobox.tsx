@@ -48,8 +48,6 @@ export function ComboboxField<TFormValues extends FieldValues>({
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              // biome-ignore lint/a11y/useSemanticElements: <explanation>
-              role="combobox"
               aria-expanded={isOpen}
               className={cn('h-12 w-[200px] justify-between', className)}
               aria-disabled={disabled}
@@ -76,7 +74,6 @@ export function ComboboxField<TFormValues extends FieldValues>({
                         if (returnType === 'object') {
                           field.onChange({ id: option.value, name: option.label })
                         } else {
-                          console.log(option.value)
                           field.onChange(option.value)
                         }
                         setIsOpen(false)

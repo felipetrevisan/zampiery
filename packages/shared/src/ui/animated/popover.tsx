@@ -1,95 +1,78 @@
-'use client';
- 
+'use client'
+
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import {
-  AnimatePresence,
-  type HTMLMotionProps,
-  type Transition,
-  motion,
-} from 'motion/react';
-import * as React from 'react';
- 
-import { cn } from '@nathy/shared/lib/utils';
- 
+import { AnimatePresence, type HTMLMotionProps, type Transition, motion } from 'motion/react'
+import * as React from 'react'
+
+import { cn } from '@nathy/shared/lib/utils'
+
 type PopoverContextType = {
-  isOpen: boolean;
-};
- 
-const PopoverContext = React.createContext<PopoverContextType | undefined>(
-  undefined,
-);
- 
+  isOpen: boolean
+}
+
+const PopoverContext = React.createContext<PopoverContextType | undefined>(undefined)
+
 const usePopover = (): PopoverContextType => {
-  const context = React.useContext(PopoverContext);
+  const context = React.useContext(PopoverContext)
   if (!context) {
-    throw new Error('usePopover must be used within a Popover');
+    throw new Error('usePopover must be used within a Popover')
   }
-  return context;
-};
- 
-type Side = 'top' | 'bottom' | 'left' | 'right';
- 
+  return context
+}
+
+type Side = 'top' | 'bottom' | 'left' | 'right'
+
 const getInitialPosition = (side: Side) => {
   switch (side) {
     case 'top':
-      return { y: 15 };
+      return { y: 15 }
     case 'bottom':
-      return { y: -15 };
+      return { y: -15 }
     case 'left':
-      return { x: 15 };
+      return { x: 15 }
     case 'right':
-      return { x: -15 };
+      return { x: -15 }
   }
-};
- 
-type PopoverProps = React.ComponentProps<typeof PopoverPrimitive.Root>;
- 
+}
+
+type PopoverProps = React.ComponentProps<typeof PopoverPrimitive.Root>
+
 function Popover({ children, ...props }: PopoverProps) {
-  const [isOpen, setIsOpen] = React.useState(
-    props?.open ?? props?.defaultOpen ?? false,
-  );
- 
+  const [isOpen, setIsOpen] = React.useState(props?.open ?? props?.defaultOpen ?? false)
+
   React.useEffect(() => {
-    if (props?.open !== undefined) setIsOpen(props.open);
-  }, [props?.open]);
- 
+    if (props?.open !== undefined) setIsOpen(props.open)
+  }, [props?.open])
+
   const handleOpenChange = React.useCallback(
     (open: boolean) => {
-      setIsOpen(open);
-      props.onOpenChange?.(open);
+      setIsOpen(open)
+      props.onOpenChange?.(open)
     },
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     [props],
-  );
- 
+  )
+
   return (
     <PopoverContext.Provider value={{ isOpen }}>
-      <PopoverPrimitive.Root
-        data-slot="popover"
-        {...props}
-        onOpenChange={handleOpenChange}
-      >
+      <PopoverPrimitive.Root data-slot="popover" {...props} onOpenChange={handleOpenChange}>
         {children}
       </PopoverPrimitive.Root>
     </PopoverContext.Provider>
-  );
+  )
 }
- 
-type PopoverTriggerProps = React.ComponentProps<
-  typeof PopoverPrimitive.Trigger
->;
- 
+
+type PopoverTriggerProps = React.ComponentProps<typeof PopoverPrimitive.Trigger>
+
 function PopoverTrigger(props: PopoverTriggerProps) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
 }
- 
-type PopoverContentProps = React.ComponentProps<
-  typeof PopoverPrimitive.Content
-> &
+
+type PopoverContentProps = React.ComponentProps<typeof PopoverPrimitive.Content> &
   HTMLMotionProps<'div'> & {
-    transition?: Transition;
-  };
- 
+    transition?: Transition
+  }
+
 function PopoverContent({
   className,
   align = 'center',
@@ -99,9 +82,9 @@ function PopoverContent({
   children,
   ...props
 }: PopoverContentProps) {
-  const { isOpen } = usePopover();
-  const initialPosition = getInitialPosition(side);
- 
+  const { isOpen } = usePopover()
+  const initialPosition = getInitialPosition(side)
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -132,15 +115,15 @@ function PopoverContent({
         </PopoverPrimitive.Portal>
       )}
     </AnimatePresence>
-  );
+  )
 }
- 
-type PopoverAnchorProps = React.ComponentProps<typeof PopoverPrimitive.Anchor>;
- 
+
+type PopoverAnchorProps = React.ComponentProps<typeof PopoverPrimitive.Anchor>
+
 function PopoverAnchor({ ...props }: PopoverAnchorProps) {
-  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
+  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />
 }
- 
+
 export {
   Popover,
   PopoverTrigger,
@@ -152,4 +135,4 @@ export {
   type PopoverTriggerProps,
   type PopoverContentProps,
   type PopoverAnchorProps,
-};
+}

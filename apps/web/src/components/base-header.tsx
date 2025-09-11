@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 interface BaseHeaderProps {
   title: string
   showTotalCount?: boolean
-  totalCount: number
+  totalCount?: number
   children: ReactNode
 }
 
@@ -18,8 +18,8 @@ export function BaseHeader({ title, showTotalCount, totalCount, children }: Base
         {showTotalCount && (
           <CountingNumber
             className="w-[50px] rounded-full border-1 border-primary/30 p-2 text-center text-accent-foreground shadow-md shadow-primary/10"
-            number={totalCount}
             fromNumber={0}
+            number={totalCount ?? 0}
           />
         )}
       </h2>

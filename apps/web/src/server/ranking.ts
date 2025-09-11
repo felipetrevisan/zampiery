@@ -4,12 +4,11 @@ import { client } from '@nathy/web/client/client'
 import { sanityFetch } from '@nathy/web/client/fetch'
 import { sanityMutate } from '@nathy/web/client/mutation'
 import {
-  getLastRankingListRankQuery,
   getPaginatedRankingListBySlugQuery,
   getPaginatedRankingListsQuery,
   getRankingListBySlugQuery,
   getRankingListsQuery,
-} from '@nathy/web/client/queries'
+} from '@nathy/web/client/queries/ranking-list'
 import { env } from '@nathy/web/config/env'
 import type { Player } from '@nathy/web/types/player'
 import type { PaginatedRanking, PaginatedSingleRanking, Ranking } from '@nathy/web/types/ranking'
@@ -55,16 +54,9 @@ export async function getPaginatedRankingListBySlug({
   })
 }
 
-export async function getRankingListOrderRank() {
-  return sanityFetch<string>({ query: getLastRankingListRankQuery })
-}
-
 export async function mutateCreateRanking({
   title,
-}: Omit<Ranking, 'id' | 'players' | 'slug' | 'playersCount'>) {
-  // const compareRank = lastRankOrder ? LexoRank.parse(lastRankOrder) : LexoRank.min()
-  // const rank = compareRank.genNext().genNext()
-
+}: Omit<Ranking, 'id' | 'players' | 'slug' | 'total'>) {
   return sanityMutate<SanityDocumentStub<Ranking>>({
     type: 'create',
     doc: {
@@ -79,7 +71,7 @@ export async function mutateCreateRanking({
 
 export async function mutateUpdateRanking(
   id: string,
-  { title }: Omit<Ranking, 'id' | 'players' | 'slug' | 'playersCount'>,
+  { title }: Omit<Ranking, 'id' | 'players' | 'slug' | 'total'>,
 ) {
   return sanityMutate<SanityDocumentStub<Ranking>>({
     type: 'patch',
@@ -129,4 +121,24 @@ export async function mutateDeletePersonFromRanking({
     .patch(ranking.id)
     .unset([`players[_ref=="${playerId}"]`])
     .commit()
+}
+
+export async function mutateUpdateOrder({
+  ranking,
+  newPlayerPosition,
+}: {
+  ranking: Ranking
+  newPlayerPosition: Player[]
+}) {
+  return getClient()
+    .patch(ranking.id)
+    .setIfMissing({ players: [] })
+    .set({
+      players: newPlayerPosition.map((player) => ({
+        _type: 'reference',
+        _key: player.key ?? v4(),
+        _ref: player.id,
+      })),
+    })
+    .commit({ autoGenerateArrayKeys: true })
 }

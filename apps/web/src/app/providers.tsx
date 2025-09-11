@@ -10,71 +10,6 @@ import { AppProvider, useApp } from '../hooks/use-app'
 import { useSettings } from '../hooks/use-settings'
 import type { ThemeColor } from '../types/settings'
 
-// function InnerProviders({ children }: { children: ReactNode }) {
-//   const { data: settings } = useSettings()
-//   const { setTheme } = useTheme()
-//   const { color, setColor } = useApp()
-
-//   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-//   useEffect(() => {
-//     if (settings?.theme.schema) {
-//       setTheme(settings.theme.schema)
-//     }
-
-//     if (settings?.theme.color) {
-//       setColor(settings.theme.color)
-//     }
-//   }, [settings])
-
-//   return (
-//     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-//       <ThemeSyncSchema schema={settings?.theme?.schema}>
-//         <ProgressProvider
-//           height="6px"
-//           color="#6366f1"
-//           options={{ showSpinner: true }}
-//           shallowRouting
-//         >
-//           <AppProvider>
-//             <Bar />
-//             <ThemeSyncColor color={color}>{children}</ThemeSyncColor>
-//           </AppProvider>
-//         </ProgressProvider>
-//       </ThemeSyncSchema>
-//     </ThemeProvider>
-//   )
-// }
-
-// function ThemeSyncSchema({
-//   schema,
-//   children,
-// }: { schema?: 'light' | 'dark' | 'system'; children: ReactNode }) {
-//   const { setTheme } = useTheme()
-
-//   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-//   useEffect(() => {
-//     if (!schema) return
-//     setTheme(schema)
-//   }, [schema])
-
-//   return <>{children}</>
-// }
-
-// function ThemeSyncColor({
-//   color,
-//   children,
-// }: { color: keyof typeof ThemeColor; children: ReactNode }) {
-//   const { setColor } = useApp()
-
-//   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-//   useEffect(() => {
-//     if (!color) return
-//     setColor(color)
-//   }, [color])
-
-//   return <div data-theme={color}>{children}</div>
-// }
-
 interface AppThemeProviderProps {
   children: ReactNode
 }
@@ -90,8 +25,8 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
         enableSystem
       >
         <ProgressProvider
-          height="6px"
           color="#6366f1"
+          height="6px"
           options={{ showSpinner: true }}
           shallowRouting
         >
@@ -111,7 +46,7 @@ function AppThemeWrapper({
   settings?: { theme?: { schema?: 'light' | 'dark' | 'system'; color?: keyof typeof ThemeColor } }
 }) {
   const { setTheme } = useTheme()
-  const { color, setColor } = useApp()
+  const { setColor } = useApp()
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {

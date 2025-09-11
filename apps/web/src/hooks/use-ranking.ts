@@ -3,7 +3,6 @@ import {
   getPaginatedRankingListBySlug,
   getRankingList,
   getRankingListBySlug,
-  getRankingListOrderRank,
 } from '@nathy/web/server/ranking'
 import type { PaginatedRanking, PaginatedSingleRanking, Ranking } from '@nathy/web/types/ranking'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
@@ -79,7 +78,8 @@ export function usePaginatedRankingListBySlug(initialData: PaginatedSingleRankin
     hasNextPage,
   } = useInfiniteQuery<PaginatedSingleRanking>({
     queryKey: ['ranking-list-paginated', slug],
-    queryFn: (ctx) => getPaginatedRankingListBySlug({ offset: ctx.pageParam as number, pageSize: 10, slug }),
+    queryFn: (ctx) =>
+      getPaginatedRankingListBySlug({ offset: ctx.pageParam as number, pageSize: 10, slug }),
     getNextPageParam: (lastGroup) => (lastGroup.hasNextPage ? lastGroup.nextOffset : undefined),
     initialPageParam: 0,
     initialData: {
@@ -102,13 +102,4 @@ export function usePaginatedRankingListBySlug(initialData: PaginatedSingleRankin
     fetchNextPage,
     hasNextPage,
   }
-}
-
-export function useLastRankingListRankOrder() {
-  const { data, isLoading, isPending } = useQuery<string>({
-    queryKey: ['last-ranking-list'],
-    queryFn: () => getRankingListOrderRank(),
-  })
-
-  return { data, isLoading, isPending }
 }

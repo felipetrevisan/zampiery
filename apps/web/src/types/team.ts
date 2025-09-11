@@ -3,7 +3,7 @@ export type Teams = {
 }
 
 export type Team = {
-  id: string;
+  id: string
   name: string
   country: string
   continent: string

@@ -2,7 +2,7 @@
 
 import { sanityFetch } from '@nathy/web/client/fetch'
 import { sanityMutate } from '@nathy/web/client/mutation'
-import { getPaginatedPlayersQuery, getPlayersQuery } from '@nathy/web/client/queries'
+import { getPaginatedPlayersQuery, getPlayersQuery } from '@nathy/web/client/queries/player'
 import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
 import type { SanityDocumentStub } from 'next-sanity'
 import { v4 } from 'uuid'

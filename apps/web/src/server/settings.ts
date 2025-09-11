@@ -2,7 +2,7 @@
 
 import { client } from '@nathy/web/client/client'
 import { sanityFetch } from '@nathy/web/client/fetch'
-import { getSettingsQuery } from '@nathy/web/client/queries'
+import { getSettingsQuery } from '@nathy/web/client/queries/settings'
 import { env } from '@nathy/web/config/env'
 import type { Settings } from '@nathy/web/types/settings'
 
@@ -23,7 +23,8 @@ export async function mutateUpdateSettings(settings: Settings) {
         schema: settings.theme.schema,
         color: settings.theme.color,
       },
-      backgroundEffect: settings.backgroundEffect
+      showBackgroundEffect: settings.showBackgroundEffect,
+      backgroundEffectType: settings.backgroundEffectType,
     })
     .commit({ autoGenerateArrayKeys: true })
 }

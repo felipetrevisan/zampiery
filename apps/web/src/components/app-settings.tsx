@@ -5,7 +5,6 @@ import { SheetContent, SheetHeader, SheetTitle } from '@nathy/shared/ui/animated
 import { useMutationUpdateSettings } from '@nathy/web/hooks/mutations/settings'
 import type { Settings, ThemeColor } from '@nathy/web/types/settings'
 import { useQueryClient } from '@tanstack/react-query'
-import * as React from 'react'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import z from 'zod'
@@ -27,14 +26,25 @@ const themeColorKeys = [
   'teal',
 ] as const
 
-const settingsFormSchema = z.object({
-  title: z.string().min(1, 'Título do App é obrigatório').default('Nathy Zampiery'),
-  theme: z.object({
-    schema: z.enum(['light', 'dark', 'system']).default('system'),
-    color: z.enum(themeColorKeys).default('default'),
-  }),
-  backgroundEffect: z.coerce.boolean().default(true)
-})
+const settingsFormSchema = z
+  .object({
+    title: z.string().min(1, 'Título do App é obrigatório').default('Nathy Zampiery'),
+    theme: z.object({
+      schema: z.enum(['light', 'dark', 'system']).default('system'),
+      color: z.enum(themeColorKeys).default('default'),
+    }),
+    showBackgroundEffect: z.coerce.boolean().default(true),
+    backgroundEffectType: z.enum(['hole', 'stars']).default('hole').optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.showBackgroundEffect && !data.backgroundEffectType) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['backgroundEffectType'],
+        message: 'O tipo de efeito de fundo é obrigatório quando o efeito está ativado',
+      })
+    }
+  })
 
 export type SettingsFormSchema = z.infer<typeof settingsFormSchema>
 
@@ -50,7 +60,8 @@ export function AppSettingsSheet({ side }: AppSettingsSheetProps) {
         schema: currentSettings?.theme.schema ?? 'system',
         color: (currentSettings?.theme.color as keyof typeof ThemeColor) ?? 'default',
       },
-      backgroundEffect: currentSettings?.backgroundEffect ?? true
+      showBackgroundEffect: currentSettings?.showBackgroundEffect ?? true,
+      backgroundEffectType: currentSettings?.backgroundEffectType,
     },
     mode: 'onChange',
   })
@@ -75,14 +86,15 @@ export function AppSettingsSheet({ side }: AppSettingsSheetProps) {
         schema: data.theme.schema,
         color: data.theme.color,
       },
-      backgroundEffect: data.backgroundEffect
+      showBackgroundEffect: data.showBackgroundEffect,
+      backgroundEffectType: data.backgroundEffectType ?? 'hole',
     }
     await updateSettings(settings)
   }
 
   return (
     <FormProvider {...settingsform}>
-      <SheetContent side={side} >
+      <SheetContent side={side}>
         <SheetHeader>
           <SheetTitle>Configurações</SheetTitle>
         </SheetHeader>

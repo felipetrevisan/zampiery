@@ -24,10 +24,23 @@ export default defineType({
       type: 'theme',
     }),
     defineField({
-      name: 'backgroundEffect',
+      name: 'showBackgroundEffect',
       title: 'Efeito de Fundo?',
       type: 'boolean',
-      initialValue: true
+      initialValue: true,
+    }),
+    defineField({
+      name: 'backgroundEffectType',
+      title: 'Tipo Efeito de Fundo',
+      type: 'string',
+      initialValue: 'hole',
+      options: {
+        list: [
+          { title: 'Estrelas', value: 'stars' },
+          { title: 'Buraco Negro', value: 'hole' },
+        ],
+      },
+      hidden: ({ parent }) => !parent?.showBackgroundEffect,
     }),
   ],
 })

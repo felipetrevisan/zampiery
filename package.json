@@ -11,11 +11,9 @@
     "dev:web": "pnpm --filter web dev",
     "dev:studio": "pnpm --filter studio dev",
     "lint:apps:check": "pnpm biome check --formatter-enabled=true --linter-enabled=true --organize-imports-enabled=false ./apps/**/src",
-    "lint:apps:organize": "pnpm biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write ./apps/**/src",
     "lint:apps:format": "pnpm biome format --write ./apps/**/src",
-    "lint:packages:check": "pnpm biome check --formatter-enabled=true --linter-enabled=true --organize-imports-enabled=false ./packages/src",
-    "lint:packages:organize": "pnpm biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write ./packages/src",
-    "lint:packages:format": "pnpm biome format --write ./packages/src"
+    "lint:packages:check": "pnpm biome check --formatter-enabled=true --linter-enabled=true --organize-imports-enabled=false ./packages/**/src",
+    "lint:packages:format": "pnpm biome format --write ./packages/**/src"
   },
   "dependencies": {
     "@t3-oss/env-core": "0.13.8",

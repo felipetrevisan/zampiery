@@ -3,10 +3,19 @@
 import { client } from '@nathy/web/client/client'
 import { sanityFetch } from '@nathy/web/client/fetch'
 import { sanityMutate } from '@nathy/web/client/mutation'
-import { getGroupedListBySlugQuery, getGroupedListQuery } from '@nathy/web/client/queries'
+import {
+  getGroupedListBySlugQuery,
+  getGroupedListQuery,
+  getPaginatedGroupedListBySlugQuery,
+  getPaginatedGroupedListQuery,
+} from '@nathy/web/client/queries/grouped-list'
 import { env } from '@nathy/web/config/env'
-import type { Attendance, Game, gameFormSchema } from '@nathy/web/types/game'
-import type { GroupedList } from '@nathy/web/types/grouped-list'
+import type { Attendance, gameFormSchema } from '@nathy/web/types/game'
+import type {
+  GroupedList,
+  PaginatedGroupedList,
+  PaginatedSingleGroupedList,
+} from '@nathy/web/types/grouped-list'
 import { generateSlug } from '@nathy/web/utils/url'
 import { format } from 'date-fns'
 import type { SanityDocumentStub } from 'next-sanity'
@@ -14,6 +23,19 @@ import { v4 } from 'uuid'
 import type z from 'zod'
 
 const getClient = () => client.withConfig({ token: env.SANITY_API_WRITE_TOKEN, useCdn: false })
+
+export async function getPaginatedGroupedList({
+  offset,
+  pageSize,
+}: {
+  offset: number
+  pageSize: number
+}): Promise<PaginatedGroupedList> {
+  return sanityFetch<PaginatedGroupedList>({
+    query: getPaginatedGroupedListQuery,
+    params: { offset, pageSize },
+  })
+}
 
 export async function getGroupedList() {
   return sanityFetch<GroupedList[]>({ query: getGroupedListQuery })
@@ -23,12 +45,24 @@ export async function getGroupedListBySlug(slug: string) {
   return sanityFetch<GroupedList>({ query: getGroupedListBySlugQuery, params: { slug } })
 }
 
+export async function getPaginatedGroupedListBySlug({
+  offset,
+  pageSize,
+  slug,
+}: {
+  offset: number
+  pageSize: number
+  slug: string
+}): Promise<PaginatedSingleGroupedList> {
+  return sanityFetch<PaginatedSingleGroupedList>({
+    query: getPaginatedGroupedListBySlugQuery,
+    params: { offset, pageSize, slug },
+  })
+}
+
 export async function mutateCreateGroupedList({
   title,
 }: Omit<GroupedList, 'id' | 'slug' | 'games'>) {
-  // const compareRank = lastRankOrder ? LexoRank.parse(lastRankOrder) : LexoRank.min()
-  // const rank = compareRank.genNext().genNext()
-
   return sanityMutate<SanityDocumentStub<GroupedList>>({
     type: 'create',
     doc: {
@@ -122,17 +156,17 @@ export async function mutateToggleAttendance({
     .commit()
 }
 
-export async function saveOrder(listId: string, players: { playerId: string; position: number }[]) {
-  return client
-    .patch(listId)
-    .setIfMissing({ entries: [] })
-    .set({
-      'entries[0].players': players.map((player) => ({
-        _type: 'object',
-        player: { _ref: player.playerId, _type: 'reference' },
-        played: false,
-        position: player.position,
-      })),
-    })
-    .commit({ autoGenerateArrayKeys: true })
-}
+// export async function saveOrder(listId: string, players: { playerId: string; position: number }[]) {
+//   return client
+//     .patch(listId)
+//     .setIfMissing({ entries: [] })
+//     .set({
+//       'entries[0].players': players.map((player) => ({
+//         _type: 'object',
+//         player: { _ref: player.playerId, _type: 'reference' },
+//         played: false,
+//         position: player.position,
+//       })),
+//     })
+//     .commit({ autoGenerateArrayKeys: true })
+// }
