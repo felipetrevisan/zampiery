@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { type PlayerFormSchema, playerFormSchema } from '@nathy/web/config/schemas/player'
 import {
   useMutationCreatePlayer,
   useMutationDeletePlayer,
@@ -11,17 +12,8 @@ import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Header } from './header'
 import { PlayersTable } from './players-table'
-
-const playerFormSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  favoritePosition: z.string().optional(),
-  favoriteTeam: z.string().optional(),
-})
-
-export type PlayerFormSchema = z.infer<typeof playerFormSchema>
 
 export function PlayersList({ data }: { data: PaginatedPlayers }) {
   const queryClient = useQueryClient()
@@ -32,6 +24,7 @@ export function PlayersList({ data }: { data: PaginatedPlayers }) {
 
   const playerForm = useForm<PlayerFormSchema>({
     resolver: zodResolver(playerFormSchema),
+    mode: 'all',
   })
 
   const { handleSubmit } = playerForm
@@ -59,7 +52,7 @@ export function PlayersList({ data }: { data: PaginatedPlayers }) {
     <FormProvider {...playerForm}>
       <div className="space-y-4 p-4">
         <Header
-          dialogOpen={isDialogOpen}
+          isDialogOpen={isDialogOpen}
           onDialogOpen={setIsDialogOpen}
           onEdit={handleSubmit(handleEditPlayer)}
           onSelectPlayer={setSelectedPlayer}

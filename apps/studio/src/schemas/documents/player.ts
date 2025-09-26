@@ -14,9 +14,9 @@ export default defineType({
       validation: (Rule) => Rule.required().warning('Este campo não pode estar vazio.'),
     }),
     defineField({
-      name: 'avatar',
+      name: 'avatarUrl',
       title: 'Avatar',
-      type: 'image',
+      type: 'string',
     }),
     defineField({
       name: 'favoritePosition',
@@ -27,8 +27,17 @@ export default defineType({
     defineField({
       name: 'favoriteTeam',
       title: 'Time Favorito',
-      type: 'string',
-      validation: (Rule) => Rule.required().warning('Este campo não pode estar vazio.'),
+      type: 'reference',
+      to: [{ type: 'team' }],
+    }),
+    defineField({
+      name: 'favorite',
+      title: 'Favorito?',
+      type: 'boolean',
+      initialValue: false,
+      options: {
+        layout: 'switch',
+      },
     }),
   ],
   preview: {
@@ -36,7 +45,7 @@ export default defineType({
       title: 'name',
       media: 'avatar',
       favoritePosition: 'favoritePosition',
-      favoriteTeam: 'favoriteTeam',
+      favoriteTeam: 'favoriteTeam.name',
     },
     prepare({ title, media, favoritePosition, favoriteTeam }) {
       return {

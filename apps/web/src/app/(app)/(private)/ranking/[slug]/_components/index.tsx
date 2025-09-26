@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { type PersonFormSchema, personFormSchema } from '@nathy/web/config/schemas/ranking'
 import {
   useMutationAddPersonToRanking,
   useMutationDeletePersonFromRanking,
@@ -8,27 +9,20 @@ import {
 import { usePaginatedRankingListBySlug } from '@nathy/web/hooks/use-ranking'
 import type { PaginatedSingleRanking } from '@nathy/web/types/ranking'
 import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import z from 'zod'
 import { Header } from './header'
 import { RankingListPlayerTable } from './ranking-list-table'
 
-const personFormSchema = z.object({
-  person: z.object({
-    id: z.string().min(1, 'Nome é obrigatório'),
-    name: z.string().min(1),
-  }),
-})
-
-export type PersonFormSchema = z.infer<typeof personFormSchema>
-
 export function RankingListView({ data }: { data: PaginatedSingleRanking }) {
   const queryClient = useQueryClient()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { allData, hasNextPage, isPending, isFetchingNextPage, fetchNextPage } =
     usePaginatedRankingListBySlug(data, data.slug)
 
   const personForm = useForm<PersonFormSchema>({
     resolver: zodResolver(personFormSchema),
+    mode: 'all',
   })
 
   const { handleSubmit } = personForm
@@ -54,6 +48,8 @@ export function RankingListView({ data }: { data: PaginatedSingleRanking }) {
       <div className="space-y-4 p-4">
         <Header
           data={data}
+          isDialogOpen={isDialogOpen}
+          onDialogOpen={setIsDialogOpen}
           onSubmit={handleSubmit(handleAddNewPerson)}
           totalPlayers={allData.length}
         />

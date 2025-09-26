@@ -1,28 +1,32 @@
+import type { GameFormSchema } from '@nathy/web/config/schemas/game'
 import {
+  mutateAddPlayerGame,
+  mutateAttachGameToList,
   mutateCreateGroupedList,
   mutateDeleteGroupedList,
   mutateUpdateGroupedList,
 } from '@nathy/web/server/grouped-list'
-import type { GroupedList, PaginatedGroupedList } from '@nathy/web/types/grouped-list'
+import type { Game } from '@nathy/web/types/game'
+import type { GroupedList } from '@nathy/web/types/grouped-list'
+import type { PaginatedPlatformListByPlatform, Platform } from '@nathy/web/types/platform'
 import { generateSlug } from '@nathy/web/utils/url'
 import { type InfiniteData, type QueryClient, useMutation } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { v4 } from 'uuid'
 
 export const useMutationCreateGroupedList = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: (data: Omit<GroupedList, 'id' | 'games' | 'slug'>) => mutateCreateGroupedList(data),
-
-    onMutate: async ({ title }) => {
-      await queryClient.cancelQueries({ queryKey: ['grouped-list-paginated'] })
-      await queryClient.cancelQueries({ queryKey: ['grouped-list'] })
+    mutationFn: (
+      data: Omit<GroupedList, 'id' | 'games' | 'slug' | 'platform'> & { platform: Platform },
+    ) => mutateCreateGroupedList({ ...data, platform: data.platform }),
+    onMutate: async ({ title, platform }) => {
+      await queryClient.cancelQueries({ queryKey: [platform.slug, 'grouped-list-paginated'] })
 
       const previousDataPaginated = queryClient.getQueryData<{
-        pages: PaginatedGroupedList[]
+        pages: PaginatedPlatformListByPlatform[]
         pageParams: unknown[]
-      }>(['grouped-list-paginated'])
-
-      const previousData = queryClient.getQueryData<GroupedList[]>(['grouped-list'])
+      }>([platform.slug, 'grouped-list-paginated'])
 
       if (!previousDataPaginated) return { previousDataPaginated }
 
@@ -30,17 +34,18 @@ export const useMutationCreateGroupedList = (queryClient: QueryClient) =>
         id: v4(),
         title,
         slug: generateSlug(title),
+        platform,
         games: [],
       }
 
       queryClient.setQueryData<{
-        pages: PaginatedGroupedList[]
+        pages: PaginatedPlatformListByPlatform[]
         pageParams: unknown[]
-      }>(['grouped-list-paginated'], (old) => {
+      }>([platform.slug, 'grouped-list-paginated'], (old) => {
         if (!old) return old
 
         const firstPage = old.pages[0]
-        const newFirstPage: PaginatedGroupedList = {
+        const newFirstPage: PaginatedPlatformListByPlatform = {
           ...firstPage,
           data: [optimisticList, ...firstPage.data],
           total: firstPage.total + 1,
@@ -52,20 +57,14 @@ export const useMutationCreateGroupedList = (queryClient: QueryClient) =>
         }
       })
 
-      queryClient.setQueryData<GroupedList[]>(['grouped-list'], (old) => [
-        ...(old ?? []),
-        optimisticList,
-      ])
-
-      return { previousDataPaginated, previousData, optimisticId: optimisticList.id }
+      return { previousDataPaginated, optimisticId: optimisticList.id }
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err, variables, context) => {
       if (context?.previousDataPaginated) {
-        queryClient.setQueryData(['grouped-list-paginated'], context.previousDataPaginated)
-      }
-
-      if (context?.previousData) {
-        queryClient.setQueryData(['grouped-list'], context.previousData)
+        queryClient.setQueryData(
+          [variables.platform.slug, 'grouped-list-paginated'],
+          context.previousDataPaginated,
+        )
       }
 
       toast.error('Não foi possível criar nova lista no momento.')
@@ -77,17 +76,21 @@ export const useMutationCreateGroupedList = (queryClient: QueryClient) =>
 
 export const useMutationUpdateGroupedList = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Omit<GroupedList, 'id' | 'games' | 'slug'> }) =>
-      mutateUpdateGroupedList(id, data),
-    onMutate: async ({ data, id }) => {
-      await queryClient.cancelQueries({ queryKey: ['grouped-list-paginated'] })
-      await queryClient.cancelQueries({ queryKey: ['grouped-list'] })
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      platform: string
+      data: Omit<GroupedList, 'id' | 'games' | 'slug' | 'platform'>
+    }) => mutateUpdateGroupedList(id, data),
+    onMutate: async ({ data, id, platform }) => {
+      await queryClient.cancelQueries({ queryKey: [platform, 'grouped-list-paginated'] })
 
       const previousDataPaginated = queryClient.getQueryData<{
-        pages: PaginatedGroupedList[]
+        pages: PaginatedPlatformListByPlatform[]
         pageParams: unknown[]
-      }>(['grouped-list-paginated'])
-      const previousData = queryClient.getQueryData<GroupedList[]>(['grouped-list'])
+      }>([platform, 'grouped-list-paginated'])
 
       if (!previousDataPaginated) return { previousDataPaginated }
 
@@ -96,37 +99,31 @@ export const useMutationUpdateGroupedList = (queryClient: QueryClient) =>
         slug: generateSlug(data.title),
       }
 
-      queryClient.setQueryData<{ pages: PaginatedGroupedList[] }>(
-        ['grouped-list-paginated'],
-        (old) => {
-          if (!old) return old
+      queryClient.setQueryData<{
+        pages: PaginatedPlatformListByPlatform[]
+        pageParams: unknown[]
+      }>([platform, 'grouped-list-paginated'], (old) => {
+        if (!old) return old
 
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              data: page.data.map((list) =>
-                list.id === id ? { ...list, ...optimisticUpdatedList } : list,
-              ),
-            })),
-          }
-        },
-      )
-
-      queryClient.setQueryData<GroupedList[]>(['grouped-list'], (old) => {
-        if (!old) return []
-        return old.map((list) => (list.id === id ? { ...list, ...optimisticUpdatedList } : list))
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            data: page.data.map((list) =>
+              list.id === id ? { ...list, ...optimisticUpdatedList } : list,
+            ),
+          })),
+        }
       })
 
-      return { previousDataPaginated, previousData }
+      return { previousDataPaginated }
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err, variables, context) => {
       if (context?.previousDataPaginated) {
-        queryClient.setQueryData(['grouped-list-paginated'], context.previousDataPaginated)
-      }
-
-      if (context?.previousData) {
-        queryClient.setQueryData(['grouped-list'], context.previousData)
+        queryClient.setQueryData<{
+          pages: PaginatedPlatformListByPlatform[]
+          pageParams: unknown[]
+        }>([variables.platform, 'grouped-list-paginated'], context.previousDataPaginated)
       }
 
       toast.error('Não foi possível atualizar a lista no momento.')
@@ -138,21 +135,19 @@ export const useMutationUpdateGroupedList = (queryClient: QueryClient) =>
 
 export const useMutationDeleteGroupedList = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: (id: string) => mutateDeleteGroupedList(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: ['grouped-list-paginated'] })
-      await queryClient.cancelQueries({ queryKey: ['grouped-list'] })
+    mutationFn: ({ id }: { id: string; platform: string }) => mutateDeleteGroupedList(id),
+    onMutate: async ({ id, platform }) => {
+      await queryClient.cancelQueries({ queryKey: [platform, 'grouped-list-paginated'] })
 
       const previousDataPaginated = queryClient.getQueryData<{
-        pages: PaginatedGroupedList[]
+        pages: PaginatedPlatformListByPlatform[]
         pageParams: unknown[]
-      }>(['grouped-list-paginated'])
-      const previousData = queryClient.getQueryData<GroupedList[]>(['grouped-list'])
+      }>([platform, 'grouped-list-paginated'])
 
       if (!previousDataPaginated) return { previousDataPaginated }
 
-      queryClient.setQueryData<InfiniteData<PaginatedGroupedList>>(
-        ['grouped-list-paginated'],
+      queryClient.setQueryData<InfiniteData<PaginatedPlatformListByPlatform>>(
+        [platform, 'grouped-list-paginated'],
         (old) => {
           if (!old) return old
 
@@ -167,20 +162,14 @@ export const useMutationDeleteGroupedList = (queryClient: QueryClient) =>
         },
       )
 
-      queryClient.setQueryData<GroupedList[]>(['grouped-list'], (old) => {
-        if (!old) return []
-        return old?.filter((list) => list.id !== id) ?? []
-      })
-
-      return { previousDataPaginated, previousData }
+      return { previousDataPaginated }
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err, variables, context) => {
       if (context?.previousDataPaginated) {
-        queryClient.setQueryData(['grouped-list-paginated'], context.previousDataPaginated)
-      }
-
-      if (context?.previousData) {
-        queryClient.setQueryData(['grouped-list'], context.previousData)
+        queryClient.setQueryData(
+          [variables.platform, 'grouped-list-paginated'],
+          context.previousDataPaginated,
+        )
       }
 
       toast.error('Não foi possível deletar a lista no momento.')
@@ -190,52 +179,78 @@ export const useMutationDeleteGroupedList = (queryClient: QueryClient) =>
     },
   })
 
-// const { mutateAsync: createGroupedList } = useMutation({
-//     mutationFn: (data: Omit<GroupedList, 'id' | 'games' | 'slug'>) => mutateCreateGroupedList(data),
-//     onSuccess: (newList) => {
-//       const sanitizedList = {
-//         ...newList,
-//         id: newList.id,
-//         slug: newList.slug,
-//       }
+export const useMutationAddPlayerToGameAndAttach = (queryClient: QueryClient) =>
+  useMutation({
+    mutationFn: async ({ list, data }: { list: GroupedList; data: GameFormSchema }) => {
+      const gameId = (await mutateAddPlayerGame(data))._id
+      const currentList = await mutateAttachGameToList({ listId: list.id, gameId })
 
-//       queryClient.setQueryData<GroupedList[]>(['grouped-list'], (old) =>
-//         old ? [...old, sanitizedList] : [sanitizedList],
-//       )
+      return { gameId, currentList, data }
+    },
+    onMutate: async ({ list, data }) => {
+      await queryClient.cancelQueries({
+        queryKey: [list.platform.slug, 'grouped-list', list.slug],
+      })
 
-//       toast.success('Lista criada com sucesso')
-//     },
-//     onError: () => {
-//       toast.error('Erro ao criar a lista')
-//     },
-//   })
+      const previousData = queryClient.getQueryData<GroupedList>([
+        list.platform.slug,
+        'grouped-list',
+        list.slug,
+      ])
 
-//   const { mutateAsync: updateGroupedList } = useMutation({
-//     mutationFn: ({ id, data }: { id: string; data: Omit<GroupedList, 'id' | 'games' | 'slug'> }) =>
-//       mutateUpdateGroupedList(id, data),
-//     onSuccess: (updatedList) => {
-//       queryClient.setQueryData<GroupedList[]>(['grouped-list'], (old) =>
-//         old
-//           ? old.map((list) => (list.id === updatedList.id ? { ...list, ...updatedList } : list))
-//           : [updatedList],
-//       )
-//       toast.success('Lista atualizada com sucesso')
-//     },
-//     onError: () => {
-//       toast.error('Erro ao atualizar a lista')
-//     },
-//   })
+      if (!previousData) {
+        return { previousData }
+      }
 
-// const { mutateAsync: deleteList } = useMutation({
-//   mutationFn: (id: string) => mutateDeleteList(id),
-//   onSuccess: (_, id) => {
-//     queryClient.setQueryData<List[]>(
-//       ['lists-names'],
-//       (old) => old?.filter((list) => list.id !== id) ?? [],
-//     )
-//     toast.success('Lista deletada com sucesso')
-//   },
-//   onError: () => {
-//     toast.error('Erro ao deletar a lista')
-//   },
-// })
+      const date = new Date(data.date)
+      date.setUTCHours(0, 0, 0, 0)
+
+      const optimisticGame: Game = {
+        id: v4(),
+        date: format(date, 'yyy-MM-dd'),
+        played: data.player.guest.score !== undefined && data.player.home.score !== undefined,
+        cancelled: false,
+        players: {
+          guest: {
+            player: {
+              id: data.player.guest.player.id,
+              name: data.player.guest.player.name,
+            },
+            score: data.player.guest.score ?? undefined,
+          },
+          home: {
+            player: {
+              id: data.player.home.player.id,
+              name: data.player.home.player.name,
+            },
+            score: data.player.home.score ?? undefined,
+          },
+        },
+      }
+
+      const newData: GroupedList = {
+        ...previousData,
+        games: [...(previousData.games ?? []), optimisticGame],
+      }
+
+      queryClient.setQueryData<GroupedList>(
+        [list.platform.slug, 'grouped-list', list.slug],
+        newData,
+      )
+
+      return { previousData }
+    },
+    onError: (_err, variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          [variables.list.platform.slug, 'grouped-list', variables.list.slug],
+          context.previousData,
+        )
+      }
+
+      toast.error('Não foi possível criar jogo no momento.')
+    },
+    onSuccess: (_createdGame, _variables, _context) => {
+      toast.success('Jogo foi criada com sucesso')
+    },
+  })

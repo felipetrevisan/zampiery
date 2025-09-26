@@ -6,6 +6,7 @@ import { getPaginatedPlayersQuery, getPlayersQuery } from '@nathy/web/client/que
 import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
 import type { SanityDocumentStub } from 'next-sanity'
 import { v4 } from 'uuid'
+import type { PlayerFormSchema } from '../config/schemas/player'
 
 export async function getPlayers() {
   return sanityFetch<Player[]>({ query: getPlayersQuery })
@@ -26,32 +27,35 @@ export async function getPaginatedPlayers({
 
 export async function mutateCreatePlayer({
   name,
+  avatar,
   favoritePosition,
   favoriteTeam,
-}: Omit<Player, 'id'>) {
+}: PlayerFormSchema) {
   return sanityMutate<SanityDocumentStub<Player>>({
     type: 'create',
     doc: {
       _type: 'player',
       _id: v4(),
+      avatarUrl: avatar,
       name,
       favoritePosition,
-      favoriteTeam,
+      favoriteTeam: { _ref: favoriteTeam?.id, _type: 'reference' },
     },
   })
 }
 
 export async function mutateUpdatePlayer(
   id: string,
-  { name, favoritePosition, favoriteTeam }: Omit<Player, 'id'>,
+  { name, avatar, favoritePosition, favoriteTeam }: PlayerFormSchema,
 ) {
   return sanityMutate<SanityDocumentStub<Player>>({
     type: 'patch',
     id,
     patchData: {
+      avatarUrl: avatar,
       name,
       favoritePosition,
-      favoriteTeam,
+      favoriteTeam: { _ref: favoriteTeam?.id, _type: 'reference' },
     },
   })
 }

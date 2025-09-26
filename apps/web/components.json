@@ -10,6 +10,7 @@
     "cssVariables": true,
     "prefix": ""
   },
+  "iconLibrary": "lucide",
   "aliases": {
     "components": "@nathy/web/components/ui",
     "utils": "@nathy/shared/lib",
@@ -17,5 +18,7 @@
     "lib": "@nathy/web/lib",
     "hooks": "@nathy/web/hooks"
   },
-  "iconLibrary": "lucide"
+  "registries": {
+    "@animate-ui": "https://animate-ui.com/r/{name}.json"
+  }
 }

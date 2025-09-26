@@ -10,7 +10,8 @@ export const rankingData = groq`
 export const rankingPlayerData = groq`
   "id": _id,
   "key": _key,
-  name
+  name,
+  "avatar": avatarUrl
 `
 
 export const getRankingListsQuery = groq`

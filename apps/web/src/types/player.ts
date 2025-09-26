@@ -1,3 +1,6 @@
+import type { Platform } from './platform'
+import type { Team } from './team'
+
 export type PaginatedPlayers = {
   data: Player[]
   total: number
@@ -10,9 +13,12 @@ export type PaginatedPlayers = {
 export type Player = {
   id: string
   key?: string
+  avatar?: string
   name: string
   favoritePosition?: string
-  favoriteTeam?: string
+  favoriteTeam?: Team
+  isFavorite?: boolean
+  game?: Platform
 }
 
 export enum PlayerPosition {

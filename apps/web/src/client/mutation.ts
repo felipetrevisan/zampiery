@@ -41,7 +41,7 @@ export async function sanityMutate<T = MutationResponse>(params: MutationParams)
     default:
       throw new Error(
         `Tipo de mutação inválido: ${
-          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          // biome-ignore lint/suspicious/noExplicitAny: false positive
           (params as any).type
         }`,
       )

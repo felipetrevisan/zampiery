@@ -1,6 +1,5 @@
 'use client'
 
-import { useTeam } from '@nathy/web/hooks/use-team'
 import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
 import type {
   FetchNextPageOptions,
@@ -38,7 +37,6 @@ export function PlayersTable({
   onDialogOpen,
   onSelectPlayer,
 }: TableProps) {
-  const { data: teams } = useTeam()
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const parentRef = useRef<HTMLDivElement | null>(null)
@@ -78,9 +76,9 @@ export function PlayersTable({
       {isPending ? (
         <LoadingPlayers />
       ) : !allPlayers?.length ? (
-        <div className="group space-y-6 rounded-2xl border border-primary/20 bg-neutral-200/80 p-3 backdrop-blur-2xl dark:bg-neutral-900/80">
+        <div className="group space-y-6 rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50">
           <div className="p-10">
-            <div className="flex items-center justify-center space-x-2 text-muted-foreground group-hover:text-primary-foreground">
+            <div className="flex items-center justify-center space-x-2 text-primary-foreground">
               Nenhuma pessoa encontrada
             </div>
           </div>
@@ -135,17 +133,12 @@ export function PlayersTable({
                   }}
                 >
                   <motion.div
-                    className="group relative flex flex-grow overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:bg-primary/80 dark:bg-neutral-900/80"
+                    className="group relative flex flex-grow overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50"
                     transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 1.01 }}
                   >
-                    <PlayerRow
-                      onDelete={setDeleteId}
-                      onEdit={openEditDialog}
-                      player={player}
-                      teams={teams?.teams ?? []}
-                    />
+                    <PlayerRow onDelete={setDeleteId} onEdit={openEditDialog} player={player} />
                   </motion.div>
                 </div>
               )

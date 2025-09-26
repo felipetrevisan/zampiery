@@ -1,15 +1,15 @@
 'use client'
 
-import { Skeleton } from '@nathy/shared/ui'
+import { Skeleton } from '@nathy/shared/ui/skeleton'
 import { motion } from 'motion/react'
 
 export function RankingRowSkeleton() {
   return (
     <motion.div
       className="group relative flex flex-grow overflow-hidden rounded-2xl border border-primary/20 bg-neutral-200/80 p-3 backdrop-blur-2xl dark:bg-neutral-900/80"
+      transition={{ type: 'spring', stiffness: 400, damping: 10 }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 1.02 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 10 }}
     >
       <div className="flex flex-grow items-center justify-between space-x-4 px-4 py-4">
         <div className="grid flex-grow grid-cols-3 items-center gap-4">

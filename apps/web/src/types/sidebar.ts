@@ -1,15 +1,7 @@
 import type { LucideProps } from 'lucide-react'
 
 export type SidebarItem = {
-  teams: Team[]
   navMain: Menu[]
-}
-
-export type Team = {
-  name: string
-  logo: React.ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
-  >
 }
 
 export type Menu = {

@@ -7,6 +7,7 @@ import { formatOrdinals } from '@nathy/web/utils/number'
 import { Trash } from 'lucide-react'
 
 import './style.css'
+import { getDicebearUrl } from '@nathy/web/utils/random-avatar'
 
 interface RowProps {
   onDelete: (id: string) => void
@@ -41,6 +42,17 @@ export function PlayerRow({ player, index, onDelete }: RowProps) {
         </span>
       </div>
       <div className="flex items-center justify-between space-x-4 px-20 py-4">
+        {player.avatar && (
+          <div
+            className="size-8 rounded-full bg-cover"
+            style={{
+              backgroundImage: `url(${getDicebearUrl({
+                url: player.avatar,
+                background: 'c0aede,d1d4f9,ffd5dc,ffdfbf',
+              })})`,
+            }}
+          />
+        )}
         <div className="w-[300px] flex-1 font-bold text-accent-foreground text-xl">
           {player.name}
         </div>

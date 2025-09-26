@@ -26,14 +26,22 @@ export default defineType({
       type: 'array',
       of: [{ type: 'reference', to: [{ type: 'game' }] }],
     }),
+    defineField({
+      name: 'platform',
+      title: 'Plataforma',
+      type: 'reference',
+      to: [{ type: 'game-platform' }],
+    }),
   ],
   preview: {
     select: {
       title: 'title',
+      platform: 'platform.title',
     },
-    prepare({ title }) {
+    prepare({ title, platform }) {
       return {
         title,
+        subtitle: platform,
       }
     },
   },

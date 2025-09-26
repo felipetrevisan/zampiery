@@ -1,18 +1,18 @@
 import { cn } from '@nathy/shared/lib/utils'
-import { type VariantProps, cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 const buttonVariants = cva(
   'group relative cursor-pointer overflow-hidden px-12 font-bold uppercase shadow-2xl [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'border border-primary',
+        default: 'active:scale-95 active:shadow-none',
       },
       theme: {
-        default: 'border border-primary',
+        default: '',
       },
       size: {
-        default: 'max-w-fit px-4 py-2 [&_svg]:size-4',
+        default: 'max-w-fit p-4 [&_svg]:size-6',
         sm: 'h-8 px-3 text-xs [&_svg]:size-4',
         lg: 'h-10 px-8 [&_svg]:size-4',
         xl: 'h-14 px-6 text-md [&_svg]:size-5',
@@ -126,8 +126,8 @@ export default function BlobButton({
 }: BlobButtonProps) {
   return (
     <button
-      type="button"
       className={cn(buttonVariants({ variant, size, theme, rounded, fullWidth, className }))}
+      type="button"
       {...props}
     >
       <span className={cn(buttonTextVariants({ theme }))} data-slot="button-text">
@@ -138,18 +138,20 @@ export default function BlobButton({
 
       <span className={buttonBlobContainerVariants({ rounded })} data-slot="button-blobs">
         <span className="relative block h-full w-full [filter:url(#goo)]">
-          {Array.from({ length: numOfBlobs }).map((_, i) => (
-            <span
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              key={i}
-              className={cn(buttonBlobVariants({ theme }))}
-              data-slot="button-blob"
-              style={{
-                left: `${i * 25}%`,
-                transitionDelay: `${i * 120}ms`,
-              }}
-            />
-          ))}
+          {Array.from({ length: numOfBlobs }).map((_, i) => {
+            const blobKey = `blob-${numOfBlobs}-${i}`
+            return (
+              <span
+                className={cn(buttonBlobVariants({ theme }))}
+                data-slot="button-blob"
+                key={blobKey}
+                style={{
+                  left: `${i * 25}%`,
+                  transitionDelay: `${i * 120}ms`,
+                }}
+              />
+            )
+          })}
         </span>
       </span>
     </button>

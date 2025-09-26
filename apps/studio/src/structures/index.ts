@@ -2,7 +2,7 @@ import { CogIcon, ListIcon, UsersIcon } from '@sanity/icons'
 import type { ConfigContext } from 'sanity'
 import type { StructureBuilder } from 'sanity/structure'
 
-const structure = (S: StructureBuilder, context: ConfigContext) =>
+const structure = (S: StructureBuilder, _context: ConfigContext) =>
   S.list()
     .title('Content Manager')
     .items([

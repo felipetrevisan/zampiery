@@ -1,23 +1,14 @@
 'use client'
 
-import { Input, Label } from '@nathy/shared/ui'
 import BlobButton from '@nathy/shared/ui/animated/button/blob-button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@nathy/shared/ui/animated/dialog'
-import { Button } from '@nathy/shared/ui/button'
-import { Separator } from '@nathy/shared/ui/separator'
+import { Dialog, DialogTrigger } from '@nathy/shared/ui/animated/dialog'
+import { CirclePlus } from '@nathy/shared/ui/animated/icons/circle-plus'
 import { BaseHeader } from '@nathy/web/components/base-header'
+import type { RankingListFormSchema } from '@nathy/web/config/schemas/ranking'
 import type { Ranking } from '@nathy/web/types/ranking'
-import { Loader2Icon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { AddRankingDialog } from './add-ranking-dialog'
 
 interface HeaderProps {
   onSubmit: () => void
@@ -25,7 +16,7 @@ interface HeaderProps {
   onSelectList: (list: Ranking | null) => void
   onDialogOpen: (state: boolean) => void
   selectedList: Ranking | null
-  dialogOpen: boolean
+  isDialogOpen: boolean
   rankingListTotalCount: number
 }
 
@@ -34,15 +25,14 @@ export function Header({
   onEdit,
   onDialogOpen,
   onSelectList,
-  dialogOpen,
+  isDialogOpen,
   selectedList,
   rankingListTotalCount = 0,
 }: HeaderProps) {
   const {
-    register,
     reset,
-    formState: { isSubmitting, isValid },
-  } = useFormContext()
+    formState: { isSubmitting },
+  } = useFormContext<RankingListFormSchema>()
 
   function handleSubmit() {
     if (selectedList) {
@@ -55,6 +45,10 @@ export function Header({
   }
 
   useEffect(() => {
+    if (!isDialogOpen) {
+      reset()
+    }
+
     if (selectedList) {
       reset({
         title: selectedList.title,
@@ -64,14 +58,12 @@ export function Header({
         title: '',
       })
     }
-  }, [selectedList, reset])
+  }, [selectedList, isDialogOpen, reset])
 
   return (
     <BaseHeader showTotalCount title="Listas de Ranking" totalCount={rankingListTotalCount}>
       <div className="flex items-center gap-2">
-        <Separator className="h-6" orientation="vertical" />
-
-        <Dialog onOpenChange={onDialogOpen} open={dialogOpen}>
+        <Dialog onOpenChange={onDialogOpen} open={isDialogOpen}>
           <form onSubmit={onSubmit}>
             <DialogTrigger asChild>
               <BlobButton
@@ -84,33 +76,11 @@ export function Header({
                 size="lg"
                 type="button"
               >
+                <CirclePlus animate="path-loop" animateOnHover animateOnTap />
                 Adicionar Nova Lista
               </BlobButton>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle> {selectedList ? 'Editar Lista' : 'Adicionar Nova Lista'}</DialogTitle>
-                <Separator className="h-6" orientation="horizontal" />
-              </DialogHeader>
-              <div className="mt-5">
-                <div className="grid gap-4">
-                  <div className="grid gap-3">
-                    <Label htmlFor="name">Título</Label>
-                    <Input {...register('title')} />
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button disabled={isSubmitting} variant="outline">
-                    Cancelar
-                  </Button>
-                </DialogClose>
-                <Button disabled={isSubmitting || !isValid} onClick={handleSubmit} type="submit">
-                  {isSubmitting ? <Loader2Icon /> : 'Salvar'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
+            <AddRankingDialog onSubmit={handleSubmit} selectedList={selectedList} />
           </form>
         </Dialog>
       </div>

@@ -1,18 +1,11 @@
 import type { Game } from './game'
-
-export type PaginatedGroupedList = {
-  data: GroupedList[]
-  total: number
-  page: number
-  pageSize: number
-  nextOffset: number
-  hasNextPage: boolean
-}
+import type { Platform } from './platform'
 
 export type GroupedList = {
   id: string
   title: string
   slug: string
+  platform: Platform
   games: Game[]
 }
 

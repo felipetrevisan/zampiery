@@ -2,6 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  type RankingListFormSchema,
+  rankingListFormSchema,
+} from '@nathy/web/config/schemas/ranking'
+import {
   useMutationCreateRanking,
   useMutationDeleteRanking,
   useMutationUpdateRanking,
@@ -11,15 +15,8 @@ import type { PaginatedRanking, Ranking } from '@nathy/web/types/ranking'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Header } from './header'
 import { RankingTable } from './ranking-table'
-
-const rankingListFormSchema = z.object({
-  title: z.string().min(1, 'Título da lista é obrigatório'),
-})
-
-export type RankingListFormSchema = z.infer<typeof rankingListFormSchema>
 
 export function RankingList({ data }: { data: PaginatedRanking }) {
   const queryClient = useQueryClient()
@@ -30,6 +27,7 @@ export function RankingList({ data }: { data: PaginatedRanking }) {
 
   const rankingListForm = useForm<RankingListFormSchema>({
     resolver: zodResolver(rankingListFormSchema),
+    mode: 'all',
   })
 
   const { handleSubmit } = rankingListForm
@@ -57,7 +55,7 @@ export function RankingList({ data }: { data: PaginatedRanking }) {
     <FormProvider {...rankingListForm}>
       <div className="space-y-4 p-4">
         <Header
-          dialogOpen={isDialogOpen}
+          isDialogOpen={isDialogOpen}
           onDialogOpen={setIsDialogOpen}
           onEdit={handleSubmit(handleEditRankingList)}
           onSelectList={setSelectedList}

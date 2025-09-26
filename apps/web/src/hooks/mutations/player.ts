@@ -1,34 +1,42 @@
+import type { PlayerFormSchema } from '@nathy/web/config/schemas/player'
 import {
   mutateCreatePlayer,
   mutateDeletePlayer,
   mutateUpdatePlayer,
 } from '@nathy/web/server/player'
 import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
+import type { Team } from '@nathy/web/types/team'
 import { type InfiniteData, type QueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { v4 } from 'uuid'
 
 export const useMutationCreatePlayer = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: (data: Omit<Player, 'id'>) => mutateCreatePlayer(data),
-
-    onMutate: async ({ name, favoritePosition, favoriteTeam }) => {
+    mutationFn: (data: PlayerFormSchema) => mutateCreatePlayer(data),
+    onMutate: async ({ name, avatar, favoritePosition, favoriteTeam }) => {
       await queryClient.cancelQueries({ queryKey: ['players-paginated'] })
       await queryClient.cancelQueries({ queryKey: ['players'] })
 
-      // Pega todas as páginas atuais do infinite query
       const previousDataPaginated = queryClient.getQueryData<{ pages: PaginatedPlayers[] }>([
         'players-paginated',
       ])
       const previousData = queryClient.getQueryData<Player[]>(['players'])
 
-      if (!previousDataPaginated) return { previousDataPaginated }
+      if (!previousDataPaginated && !previousData) {
+        return { previousDataPaginated, previousData }
+      }
+
+      const team = {
+        ...favoriteTeam,
+      } as Team
 
       const optimisticPlayer: Player = {
         id: v4(),
+        avatar,
         name,
         favoritePosition,
-        favoriteTeam,
+        favoriteTeam: team,
+        isFavorite: false,
       }
 
       queryClient.setQueryData<{ pages: PaginatedPlayers[] }>(['players-paginated'], (old) => {
@@ -60,6 +68,7 @@ export const useMutationCreatePlayer = (queryClient: QueryClient) =>
       if (context?.previousData) {
         queryClient.setQueryData(['players'], context.previousData)
       }
+
       toast.error('Não foi possível criar novo jogador no momento.')
     },
     onSuccess: (_createdPlayer, _variables, _context) => {
@@ -69,25 +78,32 @@ export const useMutationCreatePlayer = (queryClient: QueryClient) =>
 
 export const useMutationUpdatePlayer = (queryClient: QueryClient) =>
   useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Omit<Player, 'id'> }) =>
+    mutationFn: ({ id, data }: { id: string; data: PlayerFormSchema }) =>
       mutateUpdatePlayer(id, data),
     onMutate: async ({ data, id }) => {
       await queryClient.cancelQueries({ queryKey: ['players-paginated'] })
       await queryClient.cancelQueries({ queryKey: ['players'] })
 
-      // Pega todas as páginas atuais do infinite query
       const previousDataPaginated = queryClient.getQueryData<{ pages: PaginatedPlayers[] }>([
         'players-paginated',
       ])
 
       const previousData = queryClient.getQueryData<Player[]>(['players'])
 
-      if (!previousDataPaginated) return { previousDataPaginated }
+      if (!previousDataPaginated && !previousData) {
+        return { previousDataPaginated, previousData }
+      }
+
+      const team = {
+        ...data.favoriteTeam,
+      } as Team
 
       const optimisticUpdatedPlayer: Omit<Player, 'id'> = {
         name: data.name,
+        avatar: data.avatar,
         favoritePosition: data.favoritePosition,
-        favoriteTeam: data.favoriteTeam,
+        favoriteTeam: team,
+        isFavorite: data.isFavorite,
       }
 
       queryClient.setQueryData<{ pages: PaginatedPlayers[] }>(['players-paginated'], (old) => {
@@ -143,7 +159,9 @@ export const useMutationDeletePlayer = (queryClient: QueryClient) =>
 
       const previousData = queryClient.getQueryData<Player[]>(['players'])
 
-      if (!previousDataPaginated) return { previousDataPaginated }
+      if (!previousDataPaginated && !previousData) {
+        return { previousDataPaginated, previousData }
+      }
 
       queryClient.setQueryData<InfiniteData<PaginatedPlayers>>(['players-paginated'], (old) => {
         if (!old) return old
@@ -173,6 +191,7 @@ export const useMutationDeletePlayer = (queryClient: QueryClient) =>
       if (context?.previousData) {
         queryClient.setQueryData(['players'], context.previousData)
       }
+
       toast.error(
         'Erro ao deletar o jogador. Ele pode estar associado em alguma lista. Verifique e tente novamente.',
       )

@@ -12,7 +12,12 @@
   },
   "files": {
     "experimentalScannerIgnores": ["./node_modules/*"],
-    "ignoreUnknown": false
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!**/*.css",
+      "!./node_modules/*"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -43,6 +48,9 @@
       },
       "suspicious": {
         "noArrayIndexKey": "warn"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
       },
       "nursery": {
         "useSortedClasses": {

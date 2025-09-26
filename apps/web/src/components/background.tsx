@@ -16,7 +16,7 @@ export function Background() {
     setBackgroundEffectType,
   } = useApp()
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     if (data?.showBackgroundEffect) setShowBackgroundEffect(data?.showBackgroundEffect)
     if (data?.backgroundEffectType) setBackgroundEffectType(data?.backgroundEffectType)

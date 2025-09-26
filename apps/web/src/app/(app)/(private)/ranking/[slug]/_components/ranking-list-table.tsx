@@ -58,7 +58,7 @@ function SortableItem({
       {...attributes}
       {...listeners}
       className={cn(
-        'group relative flex flex-grow cursor-grab items-stretch overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:bg-primary/80 dark:bg-neutral-900/80',
+        'group relative flex flex-grow cursor-grab items-stretch overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50',
         {
           'z-50 scale-95 opacity-50 shadow-2xl': isDragging,
           'after:from-yellow-900/40 dark:after:from-yellow-400/30': index === 0,
@@ -67,7 +67,6 @@ function SortableItem({
         },
       )}
     >
-      {/* Ghost/Placeholder */}
       {isDragging ? (
         <div className="h-24 w-full animate-pulse rounded-2xl border-2 border-primary/40 border-dashed bg-muted/30" />
       ) : (
@@ -106,7 +105,7 @@ export function RankingListPlayerTable({
 
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allData?.length + 1 : allData?.length,
-    estimateSize: () => 102 * 0.9,
+    estimateSize: () => 102 * 1.01,
     getItemKey: (index) => allData[index]?.id ?? `loader-${index}`,
     getScrollElement: () => parentRef.current,
     measureElement: (el) => el.getBoundingClientRect().height,
@@ -163,9 +162,9 @@ export function RankingListPlayerTable({
       {isPending ? (
         <LoadingPlayersRanking />
       ) : !allData?.length ? (
-        <div className="group space-y-6 rounded-2xl border border-primary/20 bg-neutral-200/80 p-3 backdrop-blur-2xl dark:bg-neutral-900/80">
+        <div className="group space-y-6 rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50">
           <div className="p-10">
-            <div className="flex items-center justify-center space-x-2 text-muted-foreground group-hover:text-primary-foreground">
+            <div className="flex items-center justify-center space-x-2 text-primary-foreground">
               Nenhuma lista rankeada encontrada
             </div>
           </div>

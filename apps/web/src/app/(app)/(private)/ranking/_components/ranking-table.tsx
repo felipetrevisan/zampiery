@@ -78,9 +78,9 @@ export function RankingTable({
       {isPending ? (
         <LoadingRanking />
       ) : !allRankingList?.length ? (
-        <div className="group space-y-6 rounded-2xl border border-primary/20 bg-neutral-200/80 p-3 backdrop-blur-2xl dark:bg-neutral-900/80">
+        <div className="group space-y-6 rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50">
           <div className="p-10">
-            <div className="flex items-center justify-center space-x-2 text-muted-foreground group-hover:text-primary-foreground">
+            <div className="flex items-center justify-center space-x-2 text-primary-foreground">
               Nenhuma lista rankeada encontrada
             </div>
           </div>
@@ -135,7 +135,7 @@ export function RankingTable({
                   }}
                 >
                   <motion.div
-                    className="group relative flex flex-grow cursor-pointer overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:bg-primary/80 dark:bg-neutral-900/80"
+                    className="group relative flex flex-grow cursor-pointer overflow-hidden rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50"
                     onClick={() => router.push(`ranking/${list.slug}`)}
                     transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                     whileHover={{ scale: 1.01 }}

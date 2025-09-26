@@ -1,33 +1,25 @@
 'use client'
 
-import { Input, Label } from '@nathy/shared/ui'
 import BlobButton from '@nathy/shared/ui/animated/button/blob-button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@nathy/shared/ui/animated/dialog'
-import { Button } from '@nathy/shared/ui/button'
-import { ComboboxField } from '@nathy/shared/ui/combobox'
+import { Dialog, DialogTrigger } from '@nathy/shared/ui/animated/dialog'
+import { CirclePlus } from '@nathy/shared/ui/animated/icons/circle-plus'
 import { Separator } from '@nathy/shared/ui/separator'
 import { BaseHeader } from '@nathy/web/components/base-header'
-import { useTeam } from '@nathy/web/hooks/use-team'
-import { type Player, PlayerPosition, PlayerPositionLabels } from '@nathy/web/types/player'
-import { Loader2Icon } from 'lucide-react'
-import { useEffect } from 'react'
+import type { PlayerFormSchema } from '@nathy/web/config/schemas/player'
+import type { Player } from '@nathy/web/types/player'
+import { avatarStylesArray } from '@nathy/web/utils/avatar'
+import { buildAvatarUrl } from '@nathy/web/utils/random-avatar'
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { AddPlayerDialog } from './add-player-dialog'
 
 interface HeaderProps {
   onSubmit: () => void
   onEdit: () => void
   onSelectPlayer: (player: Player | null) => void
-  onDialogOpen: (state: boolean) => void
+  onDialogOpen: Dispatch<SetStateAction<boolean>>
   selectedPlayer: Player | null
-  dialogOpen: boolean
+  isDialogOpen: boolean
   playersTotalCount: number
 }
 
@@ -36,17 +28,24 @@ export function Header({
   onEdit,
   onDialogOpen,
   onSelectPlayer,
-  dialogOpen,
+  isDialogOpen,
   selectedPlayer,
   playersTotalCount = 0,
 }: HeaderProps) {
   const {
-    register,
-    control,
     reset,
-    formState: { isSubmitting, isValid },
-  } = useFormContext()
-  const { data, isLoading } = useTeam()
+    formState: { isSubmitting },
+  } = useFormContext<PlayerFormSchema>()
+  const [avatarSeed, setAvatarSeed] = useState(getAvatarRandomSeed)
+  const [avatarStyle, setAvatarStyle] = useState(getAvatarRandomStyle)
+
+  function getAvatarRandomStyle() {
+    return avatarStylesArray[Math.floor(Math.random() * avatarStylesArray.length)]
+  }
+
+  function getAvatarRandomSeed() {
+    return crypto.randomUUID()
+  }
 
   function handleSubmit() {
     if (selectedPlayer) {
@@ -58,29 +57,52 @@ export function Header({
     onDialogOpen(false)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
+    if (!isDialogOpen) {
+      reset()
+    }
+
     if (selectedPlayer) {
       reset({
         name: selectedPlayer.name,
+        avatar:
+          selectedPlayer.avatar ??
+          buildAvatarUrl({
+            seed: avatarSeed,
+            size: 128,
+            style: avatarStyle.slug,
+          }).url,
         favoritePosition: selectedPlayer.favoritePosition,
-        favoriteTeam: selectedPlayer.favoriteTeam,
+        favoriteTeam: {
+          id: selectedPlayer.favoriteTeam?.id,
+          name: selectedPlayer.favoriteTeam?.name,
+        },
       })
     } else {
       reset({
         name: '',
+        avatar: buildAvatarUrl({
+          seed: avatarSeed,
+          size: 128,
+          style: avatarStyle.slug,
+        }).url,
         favoritePosition: '',
-        favoriteTeam: '',
+        favoriteTeam: {
+          id: '',
+          name: '',
+        },
       })
     }
-  }, [selectedPlayer, reset])
+  }, [selectedPlayer, isDialogOpen, reset])
 
   return (
     <BaseHeader showTotalCount title="Jogadores" totalCount={playersTotalCount}>
       <div className="flex items-center gap-2">
         <Separator className="h-6" orientation="vertical" />
 
-        <Dialog onOpenChange={onDialogOpen} open={dialogOpen}>
-          <form onSubmit={onSubmit}>
+        <Dialog onOpenChange={onDialogOpen} open={isDialogOpen}>
+          <form onSubmit={handleSubmit}>
             <DialogTrigger asChild>
               <BlobButton
                 disabled={isSubmitting}
@@ -92,60 +114,20 @@ export function Header({
                 size="lg"
                 type="button"
               >
+                <CirclePlus animate="path-loop" animateOnHover animateOnTap />
                 Adicionar Novo Jogador
               </BlobButton>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {selectedPlayer ? 'Editar Jogador' : 'Adicionar Novo Jogador'}
-                </DialogTitle>
-                <Separator className="h-6" orientation="horizontal" />
-              </DialogHeader>
-              <div className="mt-5">
-                <div className="grid gap-4">
-                  <div className="grid gap-3">
-                    <Label htmlFor="name">Nome</Label>
-                    <Input {...register('name')} />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="favoritePosition">Posição Favorita</Label>
-                    <ComboboxField
-                      control={control}
-                      name="favoritePosition"
-                      options={Object.values(PlayerPosition).map((position) => {
-                        return { value: position, label: PlayerPositionLabels[position] }
-                      })}
-                      placeholder="Selecione uma posição"
-                      returnType="string"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="favoriteTeam">Time Favorito</Label>
-                    <ComboboxField
-                      control={control}
-                      disabled={isLoading || !data?.teams.length}
-                      name="favoriteTeam"
-                      options={data?.teams.map(({ id, name }) => {
-                        return { value: id, label: name }
-                      })}
-                      placeholder="Selecione um time"
-                      returnType="string"
-                    />
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button disabled={isSubmitting} variant="outline">
-                    Cancelar
-                  </Button>
-                </DialogClose>
-                <Button disabled={isSubmitting || !isValid} onClick={handleSubmit} type="submit">
-                  {isSubmitting ? <Loader2Icon /> : 'Salvar'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
+            <AddPlayerDialog
+              avatarSeed={avatarSeed}
+              avatarStyle={avatarStyle}
+              onAvatarSeed={getAvatarRandomSeed}
+              onAvatarStyle={getAvatarRandomStyle}
+              onSetAvatarSeed={setAvatarSeed}
+              onSetAvatarStyle={setAvatarStyle}
+              onSubmit={handleSubmit}
+              selectedPlayer={selectedPlayer}
+            />
           </form>
         </Dialog>
       </div>

@@ -1,68 +1,47 @@
 'use server'
 
-import { client } from '@nathy/web/client/client'
 import { sanityFetch } from '@nathy/web/client/fetch'
 import { sanityMutate } from '@nathy/web/client/mutation'
 import {
+  getGroupedListByPlatformQuery,
+  getGroupedListBySlugAndPlatformQuery,
   getGroupedListBySlugQuery,
-  getGroupedListQuery,
-  getPaginatedGroupedListBySlugQuery,
-  getPaginatedGroupedListQuery,
 } from '@nathy/web/client/queries/grouped-list'
-import { env } from '@nathy/web/config/env'
-import type { Attendance, gameFormSchema } from '@nathy/web/types/game'
-import type {
-  GroupedList,
-  PaginatedGroupedList,
-  PaginatedSingleGroupedList,
-} from '@nathy/web/types/grouped-list'
+import type { Attendance, GameStatus } from '@nathy/web/types/game'
+import type { GroupedList } from '@nathy/web/types/grouped-list'
 import { generateSlug } from '@nathy/web/utils/url'
 import { format } from 'date-fns'
 import type { SanityDocumentStub } from 'next-sanity'
 import { v4 } from 'uuid'
-import type z from 'zod'
+import { getClient } from '../config/sanity'
+import type { GameFormSchema } from '../config/schemas/game'
+import type { Platform } from '../types/platform'
 
-const getClient = () => client.withConfig({ token: env.SANITY_API_WRITE_TOKEN, useCdn: false })
-
-export async function getPaginatedGroupedList({
-  offset,
-  pageSize,
-}: {
-  offset: number
-  pageSize: number
-}): Promise<PaginatedGroupedList> {
-  return sanityFetch<PaginatedGroupedList>({
-    query: getPaginatedGroupedListQuery,
-    params: { offset, pageSize },
-  })
-}
-
-export async function getGroupedList() {
-  return sanityFetch<GroupedList[]>({ query: getGroupedListQuery })
+export async function getGroupedListByPlatform(platform: string) {
+  return sanityFetch<GroupedList[]>({ query: getGroupedListByPlatformQuery, params: { platform } })
 }
 
 export async function getGroupedListBySlug(slug: string) {
   return sanityFetch<GroupedList>({ query: getGroupedListBySlugQuery, params: { slug } })
 }
 
-export async function getPaginatedGroupedListBySlug({
-  offset,
-  pageSize,
+export async function getGroupedListBySlugAndPlatform({
   slug,
+  platform,
 }: {
-  offset: number
-  pageSize: number
   slug: string
-}): Promise<PaginatedSingleGroupedList> {
-  return sanityFetch<PaginatedSingleGroupedList>({
-    query: getPaginatedGroupedListBySlugQuery,
-    params: { offset, pageSize, slug },
+  platform: string
+}): Promise<GroupedList> {
+  return sanityFetch<GroupedList>({
+    query: getGroupedListBySlugAndPlatformQuery,
+    params: { slug, platform },
   })
 }
 
 export async function mutateCreateGroupedList({
   title,
-}: Omit<GroupedList, 'id' | 'slug' | 'games'>) {
+  platform,
+}: Omit<GroupedList, 'id' | 'slug' | 'games' | 'platform'> & { platform: Platform }) {
   return sanityMutate<SanityDocumentStub<GroupedList>>({
     type: 'create',
     doc: {
@@ -70,6 +49,7 @@ export async function mutateCreateGroupedList({
       _id: v4(),
       title,
       slug: { _type: 'slug', current: generateSlug(title) },
+      platform: { _ref: platform.id, _type: 'reference' },
       games: [],
     },
   })
@@ -77,7 +57,7 @@ export async function mutateCreateGroupedList({
 
 export async function mutateUpdateGroupedList(
   id: string,
-  { title }: Omit<GroupedList, 'id' | 'slug' | 'games'>,
+  { title }: Omit<GroupedList, 'id' | 'slug' | 'games' | 'platform'>,
 ) {
   return sanityMutate<SanityDocumentStub<GroupedList>>({
     type: 'patch',
@@ -96,17 +76,18 @@ export async function mutateDeleteGroupedList(id: string) {
   })
 }
 
-export async function mutateAddPlayerGame(data: z.infer<typeof gameFormSchema>) {
-  const slug = `${data.player.home.player.name} X ${data.player.guest.player.name} - ${data.date.getTime()} - ${v4()}`
+export async function mutateAddPlayerGame(data: GameFormSchema) {
+  const _id = v4()
 
-  return sanityMutate<SanityDocumentStub<{ _id: string }>>({
+  data?.date.setHours(0, 0, 0, 0)
+
+  await sanityMutate<SanityDocumentStub<{ _id: string }>>({
     type: 'create',
     doc: {
       _type: 'game',
-      _id: v4(),
+      _id,
       title: `${data.player.home.player.name} X ${data.player.guest.player.name}`,
-      slug: { _type: 'slug', current: generateSlug(slug) },
-      date: format(new Date(data.date), 'yyyy-MM-dd'),
+      date: format(data.date, 'yyy-MM-dd'),
       player1: { _ref: data.player.home.player.id, _type: 'reference' },
       player2: { _ref: data.player.guest.player.id, _type: 'reference' },
       played: false,
@@ -114,29 +95,37 @@ export async function mutateAddPlayerGame(data: z.infer<typeof gameFormSchema>) 
       score2: data.player.guest.score,
     },
   })
+
+  return { _id }
 }
 
 export async function mutateAttachGameToList({
   listId,
-  game,
+  gameId,
 }: {
   listId: string
-  game: { _id: string }
+  gameId: string
 }) {
-  return getClient()
+  return getClient('write')
     .patch(listId)
     .setIfMissing({ games: [] })
     .append('games', [
       {
         _type: 'reference',
-        _ref: game._id,
+        _ref: gameId,
       },
     ])
     .commit({ autoGenerateArrayKeys: true })
 }
 
-export async function toggleGamePlayed(gameId: string, played: boolean) {
-  return getClient().patch(gameId).set({ played }).commit()
+export async function toggleGameStatus(gameId: string, status: GameStatus) {
+  return getClient('write')
+    .patch(gameId)
+    .set({
+      played: status === 'played',
+      cancelled: status === 'cancelled',
+    })
+    .commit()
 }
 
 export async function mutateToggleAttendance({
@@ -148,25 +137,10 @@ export async function mutateToggleAttendance({
   player: 1 | 2
   attendance: Attendance
 }) {
-  return getClient()
+  return getClient('write')
     .patch(gameId)
     .set({
       [`attendance${player}`]: attendance === 'indeterminate' ? null : attendance === 'present',
     })
     .commit()
 }
-
-// export async function saveOrder(listId: string, players: { playerId: string; position: number }[]) {
-//   return client
-//     .patch(listId)
-//     .setIfMissing({ entries: [] })
-//     .set({
-//       'entries[0].players': players.map((player) => ({
-//         _type: 'object',
-//         player: { _ref: player.playerId, _type: 'reference' },
-//         played: false,
-//         position: player.position,
-//       })),
-//     })
-//     .commit({ autoGenerateArrayKeys: true })
-// }

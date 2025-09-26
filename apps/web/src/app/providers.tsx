@@ -4,6 +4,7 @@ import { Bar } from '@bprogress/next'
 import { ProgressProvider } from '@bprogress/next/app'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider, useTheme } from 'next-themes'
 import { type ReactNode, useEffect, useState } from 'react'
 import { AppProvider, useApp } from '../hooks/use-app'
@@ -18,23 +19,25 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
   const { data: settings } = useSettings()
 
   return (
-    <AppProvider>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme={settings?.theme.schema ?? 'system'}
-        enableSystem
-      >
-        <ProgressProvider
-          color="#6366f1"
-          height="6px"
-          options={{ showSpinner: true }}
-          shallowRouting
+    <SessionProvider>
+      <AppProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme={settings?.theme.schema ?? 'system'}
+          enableSystem
         >
-          <Bar />
-          <AppThemeWrapper settings={settings}>{children}</AppThemeWrapper>
-        </ProgressProvider>
-      </ThemeProvider>
-    </AppProvider>
+          <ProgressProvider
+            color="var(--color-primary)"
+            height="6px"
+            options={{ showSpinner: true }}
+            shallowRouting
+          >
+            <Bar />
+            <AppThemeWrapper settings={settings}>{children}</AppThemeWrapper>
+          </ProgressProvider>
+        </ThemeProvider>
+      </AppProvider>
+    </SessionProvider>
   )
 }
 
@@ -48,16 +51,16 @@ function AppThemeWrapper({
   const { setTheme } = useTheme()
   const { setColor } = useApp()
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     if (settings?.theme?.schema) setTheme(settings.theme.schema)
   }, [settings?.theme?.schema])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
   useEffect(() => {
     if (settings?.theme?.color) {
       setColor(settings.theme.color)
-      document.body.dataset.theme = settings.theme.color
+      document.documentElement.dataset.theme = settings.theme.color
     }
   }, [settings?.theme?.color])
 
@@ -70,7 +73,7 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AppThemeProvider>{children}</AppThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {process.env.NODE_ENV !== 'production' ? <ReactQueryDevtools initialIsOpen={false} /> : null}
     </QueryClientProvider>
   )
 }

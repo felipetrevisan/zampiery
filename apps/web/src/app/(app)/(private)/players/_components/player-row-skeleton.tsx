@@ -1,6 +1,6 @@
 'use client'
 
-import { Skeleton } from '@nathy/shared/ui'
+import { Skeleton } from '@nathy/shared/ui/skeleton'
 import { motion } from 'motion/react'
 
 export function PlayerRowSkeleton() {

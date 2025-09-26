@@ -8,24 +8,23 @@ export type Settings = {
   backgroundEffectType: 'hole' | 'stars'
 }
 
-export enum ThemeColor {
-  default = 'Default',
-  blue = 'Blue',
-  green = 'Green',
-  amber = 'Amber',
-  purple = 'Purple',
-  rose = 'Rose',
-  orange = 'Orange',
-  teal = 'Teal',
-}
+export const ThemeColor = {
+  default: 'default',
+  blue: 'blue',
+  green: 'green',
+  purple: 'purple',
+  crimson: 'crimson',
+  teal: 'teal',
+} as const
 
-export const ThemeColorLabels: Record<ThemeColor, string> = {
-  [ThemeColor.default]: 'Padrao',
-  [ThemeColor.blue]: 'Azul',
-  [ThemeColor.green]: 'Verde',
-  [ThemeColor.amber]: 'Ambar',
-  [ThemeColor.purple]: 'Roxo',
-  [ThemeColor.rose]: 'Rosa',
-  [ThemeColor.orange]: 'Laranja',
-  [ThemeColor.teal]: 'Teal',
+export const themeColorKeys = Object.values(ThemeColor)
+export type ThemeColorType = (typeof themeColorKeys)[number]
+
+export const ThemeColorLabels: Record<ThemeColorType, string> = {
+  default: 'Padrão',
+  blue: 'Azul',
+  green: 'Verde',
+  purple: 'Roxo',
+  crimson: 'Crimson',
+  teal: 'Azul-Petróleo',
 }

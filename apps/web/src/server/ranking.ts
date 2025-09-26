@@ -1,6 +1,5 @@
 'use server'
 
-import { client } from '@nathy/web/client/client'
 import { sanityFetch } from '@nathy/web/client/fetch'
 import { sanityMutate } from '@nathy/web/client/mutation'
 import {
@@ -9,14 +8,12 @@ import {
   getRankingListBySlugQuery,
   getRankingListsQuery,
 } from '@nathy/web/client/queries/ranking-list'
-import { env } from '@nathy/web/config/env'
 import type { Player } from '@nathy/web/types/player'
 import type { PaginatedRanking, PaginatedSingleRanking, Ranking } from '@nathy/web/types/ranking'
 import { generateSlug } from '@nathy/web/utils/url'
 import type { SanityDocumentStub } from 'next-sanity'
 import { v4 } from 'uuid'
-
-const getClient = () => client.withConfig({ token: env.SANITY_API_WRITE_TOKEN, useCdn: false })
+import { getClient } from '../config/sanity'
 
 export async function getRankingList() {
   return sanityFetch<Ranking[]>({ query: getRankingListsQuery })
@@ -97,7 +94,7 @@ export async function mutateAddPersonToRanking({
   ranking: Ranking
   player: Pick<Player, 'id'>
 }) {
-  return getClient()
+  return getClient('write')
     .patch(ranking.id)
     .setIfMissing({ players: [] })
     .insert('after', 'players[-1]', [
@@ -117,7 +114,7 @@ export async function mutateDeletePersonFromRanking({
   ranking: Ranking
   playerId: string
 }) {
-  return getClient()
+  return getClient('write')
     .patch(ranking.id)
     .unset([`players[_ref=="${playerId}"]`])
     .commit()
@@ -130,7 +127,7 @@ export async function mutateUpdateOrder({
   ranking: Ranking
   newPlayerPosition: Player[]
 }) {
-  return getClient()
+  return getClient('write')
     .patch(ranking.id)
     .setIfMissing({ players: [] })
     .set({

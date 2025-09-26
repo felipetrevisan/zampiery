@@ -5,7 +5,7 @@ import { Inter, Nixie_One, Russo_One } from 'next/font/google'
 import type { ReactNode } from 'react'
 import Providers from './providers'
 import './styles.css'
-import { Toaster } from '@nathy/shared/ui'
+import { Toaster } from '@nathy/web/components/toaster'
 import { getSettings } from '@nathy/web/server/settings'
 
 const inter = Inter({
@@ -42,19 +42,17 @@ type Props = {
   children: ReactNode
 }
 
-export default async function RootLayoutt({ children }: Props) {
+export default async function RootLayout({ children }: Props) {
   const settings = await getSettings()
 
   return (
     <html
       className={`${inter.variable} ${russo.variable} ${nixieOne.variable}`}
+      data-theme={settings.theme.color}
       lang="en"
       suppressHydrationWarning
     >
-      <body
-        className="flex h-full flex-col overflow-x-hidden antialiased"
-        data-theme={settings.theme.color}
-      >
+      <body className="flex h-full flex-col overflow-x-hidden antialiased">
         <Providers>
           {children}
           <Toaster />

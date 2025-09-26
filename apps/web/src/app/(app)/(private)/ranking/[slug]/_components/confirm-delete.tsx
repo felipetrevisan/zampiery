@@ -17,7 +17,7 @@ interface ConfirmDeleteAlertProps {
 
 export function ConfirmDeleteAlert({ deleteId, onDelete, onSetDeleteId }: ConfirmDeleteAlertProps) {
   return (
-    <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && onSetDeleteId(null)}>
+    <AlertDialog onOpenChange={(open) => !open && onSetDeleteId(null)} open={!!deleteId}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Tem certeza que deseja excluir?</AlertDialogTitle>
@@ -28,11 +28,11 @@ export function ConfirmDeleteAlert({ deleteId, onDelete, onSetDeleteId }: Confir
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => onSetDeleteId(null)}>Cancelar</AlertDialogCancel>
           <AlertDialogAction
+            className="bg-primary text-primary-foreground"
             onClick={() => {
               if (deleteId) onDelete(deleteId)
               onSetDeleteId(null)
             }}
-            className="bg-primary text-primary-foreground"
           >
             Deletar
           </AlertDialogAction>

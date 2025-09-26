@@ -1,64 +1,45 @@
 'use client'
 
-import { Label, toast } from '@nathy/shared/ui'
 import BlobButton from '@nathy/shared/ui/animated/button/blob-button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@nathy/shared/ui/animated/dialog'
-import { HighlightText } from '@nathy/shared/ui/animated/text/highlight'
-import { Button } from '@nathy/shared/ui/button'
-import { ComboboxField } from '@nathy/shared/ui/combobox'
+import { Dialog, DialogTrigger } from '@nathy/shared/ui/animated/dialog'
+import { CirclePlus } from '@nathy/shared/ui/animated/icons/circle-plus'
+import { Copy } from '@nathy/shared/ui/animated/icons/copy'
 import { Separator } from '@nathy/shared/ui/separator'
 import { BaseHeader } from '@nathy/web/components/base-header'
-import { usePlayer } from '@nathy/web/hooks/use-player'
+import type { PersonFormSchema } from '@nathy/web/config/schemas/ranking'
 import type { PaginatedSingleRanking } from '@nathy/web/types/ranking'
-import { Loader2Icon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { AddPlayerToRankingDialog } from './add-player-dialog'
+import { CopyPlayerDialog } from './copy-player-dialog'
 
 interface HeaderProps {
   data: PaginatedSingleRanking
+  onDialogOpen: (state: boolean) => void
+  isDialogOpen: boolean
   totalPlayers: number
   onSubmit: () => void
 }
 
-export function Header({ data, totalPlayers, onSubmit }: HeaderProps) {
+export function Header({ data, totalPlayers, onDialogOpen, isDialogOpen, onSubmit }: HeaderProps) {
   const {
-    control,
-    formState: { isSubmitting, isValid },
-  } = useFormContext()
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+    reset,
+    formState: { isSubmitting },
+  } = useFormContext<PersonFormSchema>()
   const [isDialogCopyOpen, setIsDialogCopyOpen] = useState(false)
-  const [isCopied, setIsCopied] = useState(false)
-
-  const { data: players, isLoading: loadingPlayers } = usePlayer([])
 
   function handleSubmit() {
     onSubmit()
-    setIsDialogOpen(false)
+    onDialogOpen(false)
   }
 
-  const names = data.data.map((person) => person.name)
-  const formatted =
-    names.length > 1
-      ? `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`
-      : (names[0] ?? '')
-
-  const copyNames = () => {
-    setIsCopied(true)
-    navigator.clipboard.writeText(formatted)
-
-    toast.success('Nomes copiado na área de transferencia')
-  }
+  useEffect(() => {
+    if (!isDialogOpen) {
+      reset()
+    }
+  }, [isDialogOpen, reset])
 
   const closeCopyDialog = () => {
-    setIsCopied(false)
     setIsDialogCopyOpen(false)
   }
 
@@ -67,85 +48,26 @@ export function Header({ data, totalPlayers, onSubmit }: HeaderProps) {
       <div className="flex items-center gap-2">
         <Separator className="h-6" orientation="vertical" />
 
-        <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
+        <Dialog onOpenChange={onDialogOpen} open={isDialogOpen}>
           <form onSubmit={onSubmit}>
             <DialogTrigger asChild>
               <BlobButton disabled={isSubmitting} rounded="2xl" size="lg" type="button">
+                <CirclePlus animate="path-loop" animateOnHover animateOnTap />
                 Adicionar Pessoa
               </BlobButton>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Adicionar Nova Pessoa</DialogTitle>
-                <Separator className="h-6" orientation="horizontal" />
-              </DialogHeader>
-              <div className="mt-5">
-                <div className="grid gap-4">
-                  <div className="grid gap-3">
-                    <Label htmlFor="type">Pessoa</Label>
-                    <ComboboxField
-                      control={control}
-                      disabled={loadingPlayers || !players?.length}
-                      name="person"
-                      options={players?.map((player) => {
-                        return { value: player.id, label: player.name }
-                      })}
-                      placeholder="Selecione uma pessoa"
-                    />
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button disabled={isSubmitting} variant="outline">
-                    Cancelar
-                  </Button>
-                </DialogClose>
-                <Button
-                  disabled={isSubmitting || loadingPlayers || !players?.length || !isValid}
-                  onClick={handleSubmit}
-                  type="submit"
-                >
-                  {isSubmitting ? <Loader2Icon /> : 'Salvar'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
+            <AddPlayerToRankingDialog onSubmit={handleSubmit} />
           </form>
         </Dialog>
 
         <Dialog onOpenChange={setIsDialogCopyOpen} open={isDialogCopyOpen}>
           <DialogTrigger asChild>
             <BlobButton disabled={!data.total} rounded="2xl" size="lg" type="button">
+              <Copy animate="path-loop" animateOnHover animateOnTap />
               Copiar
             </BlobButton>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Copiar Lista</DialogTitle>
-              <Separator className="h-6" orientation="horizontal" />
-            </DialogHeader>
-            <div className="mt-5">
-              <div className="grid gap-4">
-                <div className="grid gap-3">
-                  {isCopied ? (
-                    <HighlightText text={formatted} />
-                  ) : (
-                    <span className="text-xl">{formatted}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button onClick={closeCopyDialog} variant="outline">
-                  Fechar
-                </Button>
-              </DialogClose>
-              <Button onClick={copyNames} variant="outline">
-                Copiar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
+          <CopyPlayerDialog onClose={closeCopyDialog} players={data.data} />
         </Dialog>
       </div>
     </BaseHeader>

@@ -44,14 +44,14 @@ export function ComboboxField<TFormValues extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <Popover open={isOpen} onOpenChange={setIsOpen} modal>
+        <Popover modal onOpenChange={setIsOpen} open={isOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
+              aria-disabled={disabled}
               aria-expanded={isOpen}
               className={cn('h-12 w-[200px] justify-between', className)}
-              aria-disabled={disabled}
               disabled={disabled}
+              variant="outline"
             >
               {returnType === 'object'
                 ? (field.value?.name ?? placeholder)
@@ -61,14 +61,13 @@ export function ComboboxField<TFormValues extends FieldValues>({
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
             <Command>
-              <CommandInput placeholder={placeholder} className="h-9" />
+              <CommandInput className="h-9" placeholder={placeholder} />
               <CommandList>
                 <CommandEmpty>Nenhuma opção encontrada</CommandEmpty>
                 <CommandGroup>
                   {options?.map((option) => (
                     <CommandItem
                       key={option.value}
-                      value={option.value}
                       onMouseDown={(e) => {
                         e.preventDefault()
                         if (returnType === 'object') {
@@ -78,6 +77,7 @@ export function ComboboxField<TFormValues extends FieldValues>({
                         }
                         setIsOpen(false)
                       }}
+                      value={option.value}
                     >
                       {option.label}
                       <Check

@@ -3,8 +3,16 @@ import { groq } from 'next-sanity'
 export const playerData = groq`
     "id": _id,
     name,
+    "avatar": avatarUrl,
     favoritePosition,
-    favoriteTeam
+    "favoriteTeam": favoriteTeam-> {
+      "id": _id,
+      name,
+      country,
+      continent,
+      shield
+    },
+    "isFavorite": favorite,
 `
 
 export const getPlayersQuery = groq`

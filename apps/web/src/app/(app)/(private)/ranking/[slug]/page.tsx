@@ -1,8 +1,4 @@
-import {
-  getPaginatedRankingListBySlug,
-  getRankingList,
-  getRankingListBySlug,
-} from '@nathy/web/server/ranking'
+import { getPaginatedRankingListBySlug, getRankingList } from '@nathy/web/server/ranking'
 import { RankingListView } from './_components'
 
 interface PageProps {
