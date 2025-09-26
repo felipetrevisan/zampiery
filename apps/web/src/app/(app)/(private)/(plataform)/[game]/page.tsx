@@ -26,6 +26,6 @@ export async function generateStaticParams() {
   const platforms = await getPlatforms()
 
   return platforms.map((platform) => ({
-    slug: platform.slug,
+    game: platform.slug,
   }))
 }
