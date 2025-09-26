@@ -42,6 +42,7 @@ export function ProfileDialog({ isDialogOpen }: Props) {
   const {
     register,
     setError,
+    setValue,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting, isValid },
@@ -80,6 +81,17 @@ export function ProfileDialog({ isDialogOpen }: Props) {
       toast.error('Não foi possível atualizar seu perfil. Verifique os erros e tente novamente.')
     }
   }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: false positive
+  useEffect(() => {
+    if (session?.user.name) {
+      setValue('name', session.user.name)
+    }
+
+    if (session?.user.email) {
+      setValue('email', session.user.email)
+    }
+  }, [session])
 
   function getAvatarRandomStyle() {
     return avatarStylesArray[Math.floor(Math.random() * avatarStylesArray.length)]
