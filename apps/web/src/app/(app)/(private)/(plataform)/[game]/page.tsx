@@ -21,11 +21,3 @@ export default async function Platform({ params }: PageProps) {
 
   return <PlatformGameListView platform={data} />
 }
-
-export async function generateStaticParams() {
-  const platforms = await getPlatforms()
-
-  return platforms.map((platform) => ({
-    game: platform.slug,
-  }))
-}
