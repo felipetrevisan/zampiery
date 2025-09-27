@@ -45,7 +45,7 @@ export function PlatformsTable({
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allPlatforms?.length + 1 : allPlatforms?.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 102 * 1.06,
+    estimateSize: () => 102 * 1.48,
     overscan: 5,
     getItemKey: (index) => allPlatforms[index]?.id ?? `loader-${index}`,
     measureElement: (el) => el.getBoundingClientRect().height,

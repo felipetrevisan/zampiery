@@ -1,7 +1,7 @@
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <main className="flex h-screen items-center justify-center">{children}</main>
+      <div className="flex h-screen items-center justify-center">{children}</div>
       <svg className="hidden" version="1.1" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="goo">

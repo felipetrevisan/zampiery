@@ -91,7 +91,6 @@ export function SidebarToolbar() {
             >
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  {/* {session?.user?.image && <RandomAvatar seed={session?.user?.image } />} */}
                   {session?.user?.image && (
                     <div
                       className="size-10 rounded-full bg-cover"
@@ -106,15 +105,22 @@ export function SidebarToolbar() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => setIsProfileDialogOpen(true)}>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onSelect={() => setIsProfileDialogOpen(true)}
+                >
                   Atualizar Perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setIsProfilePasswordDialogOpen(true)}>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onSelect={() => setIsProfilePasswordDialogOpen(true)}
+                >
                   Atualizar Senha
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                className="cursor-pointer"
                 onClick={async () => {
                   try {
                     await signOut({ redirect: true, callbackUrl: '/login' })

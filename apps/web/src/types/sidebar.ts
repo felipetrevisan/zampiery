@@ -1,9 +1,5 @@
 import type { LucideProps } from 'lucide-react'
 
-export type SidebarItem = {
-  navMain: Menu[]
-}
-
 export type Menu = {
   title: string
   url: string
