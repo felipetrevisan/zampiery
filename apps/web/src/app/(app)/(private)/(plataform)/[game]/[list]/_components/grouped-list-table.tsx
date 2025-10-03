@@ -11,7 +11,6 @@ import type { Game } from '@nathy/web/types/game'
 import type { GroupedList } from '@nathy/web/types/grouped-list'
 import { isBefore, isToday, parseISO, startOfDay } from 'date-fns'
 import { useEffect, useMemo, useState } from 'react'
-// import { ConfirmDeleteAlert } from './confirm-delete'
 import { DateGroup } from './group/date'
 import { LoadingDates } from './loading-dates'
 

@@ -8,10 +8,11 @@ import type { GroupedList } from '@nathy/web/types/grouped-list'
 
 interface HeaderProps {
   onDialogOpen: (state: boolean) => void
+  onSelectedDate: (date: string | null) => void
   data: GroupedList
 }
 
-export function Header({ onDialogOpen, data }: HeaderProps) {
+export function Header({ onDialogOpen, onSelectedDate, data }: HeaderProps) {
   return (
     <BaseHeader showTotalCount={false} title={data.title}>
       <div className="flex items-center gap-2">
@@ -19,6 +20,7 @@ export function Header({ onDialogOpen, data }: HeaderProps) {
 
         <BlobButton
           onClick={() => {
+            onSelectedDate(new Date().toLocaleDateString())
             onDialogOpen(true)
           }}
           rounded="2xl"

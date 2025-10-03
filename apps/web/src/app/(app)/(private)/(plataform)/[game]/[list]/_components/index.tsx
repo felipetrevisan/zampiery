@@ -39,7 +39,7 @@ export function GroupedListView({ list }: { list: GroupedList }) {
   return (
     <FormProvider {...gameForm}>
       <div className="space-y-4 p-4">
-        <Header data={list} onDialogOpen={setIsDialogOpen} />
+        <Header data={list} onDialogOpen={setIsDialogOpen} onSelectedDate={setSelectedDate} />
         <GroupedListTable
           allData={allData}
           dialogOpen={isDialogOpen}
