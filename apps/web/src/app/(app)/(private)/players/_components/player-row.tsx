@@ -54,7 +54,7 @@ export function PlayerRow({ player, onDelete, onEdit }: RowProps) {
               </AnimateIcon>
             )}
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="md:justify-betwwen flex flex-col gap-4 md:flex-row md:items-center">
             {player.favoriteTeam && (
               <div className="font-russo text-accent-foreground text-xl group-hover:text-primary-foreground sm:text-lg md:text-center">
                 {player.favoriteTeam.name}
