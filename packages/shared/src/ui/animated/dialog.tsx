@@ -158,7 +158,7 @@ type DialogHeaderProps = React.ComponentProps<'div'>
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
   return (
     <div
-      className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)}
+      className={cn('flex flex-col space-y-1.5 text-left', className)}
       data-slot="dialog-header"
       {...props}
     />

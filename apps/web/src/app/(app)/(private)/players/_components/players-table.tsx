@@ -45,7 +45,7 @@ export function PlayersTable({
 
   const isMobile = useMediaQuery()
 
-  const gap = isMobile ? 1 : 1.06
+  const gap = isMobile ? 1.68 : 1.06
 
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allPlayers?.length + 1 : allPlayers?.length,

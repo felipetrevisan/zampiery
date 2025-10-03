@@ -1,5 +1,6 @@
 'use client'
 
+import { useMediaQuery } from '@nathy/shared/hooks/use-media-query'
 import { AnimateIcon } from '@nathy/shared/ui/animated/icons/icon'
 import { Star } from '@nathy/shared/ui/animated/icons/star'
 import { Toolbar } from '@nathy/web/components/toolbar'
@@ -14,46 +15,61 @@ interface RowProps {
 }
 
 export function PlayerRow({ player, onDelete, onEdit }: RowProps) {
+  const isMobile = useMediaQuery()
+
   return (
     <>
-      <div className="relative flex w-[80px] max-w-[80px] flex-shrink-0 items-center justify-center">
-        {player.avatar && (
-          <div
-            className="size-16 rounded-full bg-cover"
-            style={{
-              backgroundImage: `url(${getDicebearUrl({ url: player.avatar, background: 'c0aede,d1d4f9,ffd5dc,ffdfbf' })}`,
-            }}
-          />
-        )}
-        {player.isFavorite && (
-          <AnimateIcon asChild>
-            <Star
-              animate="fill"
-              animation="fill"
-              className="absolute top-0 right-0 text-amber-400"
+      {!isMobile && (
+        <div className="relative hidden md:flex md:w-[80px] md:max-w-[80px] md:flex-shrink-0 md:items-center md:justify-center">
+          {player.avatar && (
+            <div
+              className="size-16 rounded-full bg-cover"
+              style={{
+                backgroundImage: `url(${getDicebearUrl({ url: player.avatar, background: 'c0aede,d1d4f9,ffd5dc,ffdfbf' })}`,
+              }}
             />
-          </AnimateIcon>
-        )}
-      </div>
+          )}
+          {player.isFavorite && (
+            <AnimateIcon asChild>
+              <Star
+                animate="fill"
+                animation="fill"
+                className="absolute top-0 right-0 text-amber-400"
+              />
+            </AnimateIcon>
+          )}
+        </div>
+      )}
       <div className="flex flex-grow items-center justify-between space-x-4 px-4 py-4">
-        <div className="grid flex-grow grid-cols-3 items-center">
-          <div className="font-semibold text-accent-foreground text-xl group-hover:text-primary-foreground">
+        <div className="flex flex-col md:grid md:flex-grow md:grid-cols-3 md:items-center">
+          <div className="font-semibold text-accent-foreground text-lg group-hover:text-primary-foreground sm:text-xl">
             {player.name}
+            {isMobile && player.isFavorite && (
+              <AnimateIcon asChild>
+                <Star
+                  animate="fill"
+                  animation="fill"
+                  className="absolute top-0 right-0 text-amber-400"
+                />
+              </AnimateIcon>
+            )}
           </div>
-          {player.favoriteTeam && (
-            <div className="text-center font-russo text-accent-foreground text-xl group-hover:text-primary-foreground">
-              {player.favoriteTeam.name}
-            </div>
-          )}
-          {player.favoritePosition && (
-            <div className="flex justify-end">
-              <div className="rounded-full bg-secondary p-3 font-bold text-secondary-foreground text-sm shadow-secondary/30 shadow-xl">
-                {PlayerPositionLabels[
-                  player.favoritePosition as keyof typeof PlayerPositionLabels
-                ] ?? 'Posição Desconhecida'}
+          <div className="flex flex-col gap-4">
+            {player.favoriteTeam && (
+              <div className="font-russo text-accent-foreground text-xl group-hover:text-primary-foreground sm:text-lg md:text-center">
+                {player.favoriteTeam.name}
               </div>
-            </div>
-          )}
+            )}
+            {player.favoritePosition && (
+              <div className="flex md:justify-end">
+                <div className="rounded-full bg-secondary p-2 font-bold text-secondary-foreground text-sm shadow-secondary/30 shadow-xl md:p-3">
+                  {PlayerPositionLabels[
+                    player.favoritePosition as keyof typeof PlayerPositionLabels
+                  ] ?? 'Posição Desconhecida'}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <Toolbar<Player>
           buttons={[

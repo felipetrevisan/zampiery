@@ -21,6 +21,8 @@ interface AddPlatformDialogProps {
   selectedPlatform: Platform | null
 }
 
+const MotionDialogFooter = motion(DialogFooter)
+
 export function AddPlatformDialog({ onSubmit, selectedPlatform }: AddPlatformDialogProps) {
   const {
     register,
@@ -60,7 +62,12 @@ export function AddPlatformDialog({ onSubmit, selectedPlatform }: AddPlatformDia
         </div>
       </div>
       <Separator className="h-6" orientation="horizontal" />
-      <DialogFooter>
+      <MotionDialogFooter
+        animate={{ marginTop: errors.title ? 60 : 0 }}
+        className="flex flex-col gap-3"
+        exit={{ marginTop: 0 }}
+        initial={{ marginTop: 0 }}
+      >
         <DialogClose asChild>
           <Button disabled={isSubmitting} variant="outline">
             Cancelar
@@ -75,7 +82,7 @@ export function AddPlatformDialog({ onSubmit, selectedPlatform }: AddPlatformDia
             </>
           )}
         </Button>
-      </DialogFooter>
+      </MotionDialogFooter>
     </DialogContent>
   )
 }

@@ -202,12 +202,9 @@ export const useMutationAddPlayerToGameAndAttach = (queryClient: QueryClient) =>
         return { previousData }
       }
 
-      const date = new Date(data.date)
-      date.setUTCHours(0, 0, 0, 0)
-
       const optimisticGame: Game = {
         id: v4(),
-        date: format(date, 'yyy-MM-dd'),
+        date: format(data.date, 'yyyy-MM-dd'),
         played: data.player.guest.score !== undefined && data.player.home.score !== undefined,
         cancelled: false,
         players: {

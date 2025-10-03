@@ -1,3 +1,4 @@
+import { ClubsView } from '@nathy/web/app/(app)/(private)/(plataform)/[game]/[list]/_clubs'
 import { getPlatforms } from '@nathy/web/server/game-platform'
 import {
   getGroupedListByPlatform,
@@ -18,6 +19,8 @@ export default async function Page({ params }: PageProps) {
     slug: list,
     platform: game,
   })
+
+  if (data.isClub && data.clubs?.id) return <ClubsView list={data} />
 
   return <GroupedListView list={data} />
 }
