@@ -15,7 +15,7 @@ interface RowProps {
 export function PlatformRow({ platform, onDelete, onEdit }: RowProps) {
   return (
     <div className="flex flex-grow items-center justify-between space-x-4 px-4 py-4">
-      <div className="relative flex w-[80px] max-w-[80px] flex-shrink-0 items-center justify-center">
+      <div className="relative hidden w-[80px] max-w-[80px] flex-shrink-0 items-center justify-center md:flex">
         {platform.logo && (
           <Image
             alt={platform.title}
@@ -26,8 +26,8 @@ export function PlatformRow({ platform, onDelete, onEdit }: RowProps) {
           />
         )}
       </div>
-      <div className="grid flex-grow grid-cols-3 items-center">
-        <div className="font-semibold text-accent-foreground text-xl group-hover:text-primary-foreground">
+      <div className="grid flex-grow grid-cols-1 items-center md:grid-cols-3">
+        <div className='font-semibold text-accent-foreground group-hover:text-primary-foreground sm:text-3xl md:text-xl'>
           {platform.title}
         </div>
       </div>

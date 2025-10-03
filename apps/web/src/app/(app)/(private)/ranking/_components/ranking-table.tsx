@@ -1,5 +1,6 @@
 'use client'
 
+import { useMediaQuery } from '@nathy/shared/hooks/use-media-query'
 import type { PaginatedRanking, Ranking } from '@nathy/web/types/ranking'
 import type {
   FetchNextPageOptions,
@@ -44,10 +45,14 @@ export function RankingTable({
   const parentRef = useRef<HTMLDivElement | null>(null)
   const loaderRef = useRef<HTMLDivElement | null>(null)
 
+  const isMobile = useMediaQuery()
+
+  const gap = isMobile ? 1.10: 1.27
+
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allRankingList?.length + 1 : allRankingList?.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 102 * 1.27,
+    estimateSize: () => 102 * gap,
     overscan: 5,
     getItemKey: (index) => allRankingList[index]?.id ?? `loader-${index}`,
     measureElement: (el) => el.getBoundingClientRect().height,

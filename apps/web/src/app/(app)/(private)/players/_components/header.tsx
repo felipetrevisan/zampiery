@@ -115,7 +115,7 @@ export function Header({
                 type="button"
               >
                 <CirclePlus animate="path-loop" animateOnHover animateOnTap />
-                Adicionar Novo Jogador
+                <span className="hidden md:block">Adicionar Novo Jogador</span>
               </BlobButton>
             </DialogTrigger>
             <AddPlayerDialog

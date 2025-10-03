@@ -53,7 +53,7 @@ export function Header({ data, totalPlayers, onDialogOpen, isDialogOpen, onSubmi
             <DialogTrigger asChild>
               <BlobButton disabled={isSubmitting} rounded="2xl" size="lg" type="button">
                 <CirclePlus animate="path-loop" animateOnHover animateOnTap />
-                Adicionar Pessoa
+                <span className="hidden md:block">Adicionar Pessoa</span>
               </BlobButton>
             </DialogTrigger>
             <AddPlayerToRankingDialog onSubmit={handleSubmit} />
@@ -64,7 +64,7 @@ export function Header({ data, totalPlayers, onDialogOpen, isDialogOpen, onSubmi
           <DialogTrigger asChild>
             <BlobButton disabled={!data.total} rounded="2xl" size="lg" type="button">
               <Copy animate="path-loop" animateOnHover animateOnTap />
-              Copiar
+              <span className="hidden md:block">Copiar</span>
             </BlobButton>
           </DialogTrigger>
           <CopyPlayerDialog onClose={closeCopyDialog} players={data.data} />

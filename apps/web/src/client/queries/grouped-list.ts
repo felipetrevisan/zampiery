@@ -7,6 +7,12 @@ export const groupedListData = groq`
   "platform": {
     "slug": platform->slug.current
   },
+  isClub,
+  "clubs": club-> {
+    "id": _id,
+    name,
+    formation,
+  },
 `
 
 export const groupedListGameData = groq`

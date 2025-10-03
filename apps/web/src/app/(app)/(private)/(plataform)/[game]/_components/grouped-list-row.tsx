@@ -12,8 +12,8 @@ interface RowProps {
 
 export function GroupedListRow({ list, onDelete, onEdit }: RowProps) {
   return (
-    <div className="group flex w-full items-center justify-between space-x-2 py-4">
-      <div className="w-[400px] font-bold text-accent-foreground text-xl group-hover:text-primary">
+    <div className="group flex w-full items-center justify-between gap-4 py-4 md:gap-2">
+      <div className="truncate text-left font-bold text-accent-foreground text-lg group-hover:text-primary sm:text-xl md:w-[400px]">
         {list.title}
       </div>
       <Toolbar<GroupedList>
@@ -34,7 +34,7 @@ export function GroupedListRow({ list, onDelete, onEdit }: RowProps) {
             onClick: (list) => onDelete(list.id),
           },
         ]}
-        className="opacity-0 transition-opacity ease-in-out group-hover:opacity-100"
+        className='md:ransition-opacity md:opacity-0 md:ease-in-out md:group-hover:opacity-100'
         context={list}
       />
     </div>

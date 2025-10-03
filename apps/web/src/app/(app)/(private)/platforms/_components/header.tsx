@@ -80,7 +80,7 @@ export function Header({
                 type="button"
               >
                 <CirclePlus animate="path-loop" animateOnHover animateOnTap />
-                Adicionar Nova Plataforma
+                <span className="hidden md:block">Adicionar Nova Plataforma</span>
               </BlobButton>
             </DialogTrigger>
             <AddPlatformDialog onSubmit={handleSubmit} selectedPlatform={selectedPlatform} />

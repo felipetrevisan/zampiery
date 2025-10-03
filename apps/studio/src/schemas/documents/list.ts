@@ -32,6 +32,18 @@ export default defineType({
       type: 'reference',
       to: [{ type: 'game-platform' }],
     }),
+    defineField({
+      name: 'isClub',
+      title: 'Clube?',
+      type: 'boolean',
+    }),
+    defineField({
+      name: 'club',
+      title: 'Clube',
+      type: 'reference',
+      to: [{ type: 'club' }],
+      hidden: ({ parent }) => !parent?.isClub
+    }),
   ],
   preview: {
     select: {

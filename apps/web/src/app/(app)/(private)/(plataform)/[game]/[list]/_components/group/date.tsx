@@ -62,7 +62,7 @@ export function DateGroup({
                 items={games.map((g) => g.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="mt-6 grid grid-cols-[repeat(4,max-content)] gap-4">
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {games.map((game, idx) => (
                     <SortableGameCard game={game} index={idx} key={game.id} />
                   ))}

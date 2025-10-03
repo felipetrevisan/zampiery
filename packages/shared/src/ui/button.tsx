@@ -23,6 +23,9 @@ const buttonVariants = cva(
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
         icon: 'size-12 rounded-full',
       },
+      ripple: {
+        true: 'transition-all duration-300 hover:border-cyan-300" hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]',
+      },
     },
     defaultVariants: {
       variant: 'default',
@@ -35,6 +38,7 @@ function Button({
   className,
   variant,
   size,
+  ripple,
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
@@ -45,7 +49,7 @@ function Button({
 
   return (
     <Comp
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, ripple, className }))}
       data-slot="button"
       {...props}
     />

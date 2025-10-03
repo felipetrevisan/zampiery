@@ -52,16 +52,16 @@ export function SidebarToolbar() {
 
   return (
     <>
-      <div className="z-10 mx-10 flex justify-between gap-4">
+      <div className="z-10 mx-4 flex justify-between md:mx-10 md:gap-4">
         <div className="flex items-center justify-center gap-4">
-          <SidebarTrigger className="z-10 my-4" />
+          <Button className="my-4 size-12" ripple size="icon" variant="ghost">
+            <SidebarTrigger className="z-10 my-4" />
+          </Button>
           <Sheet onOpenChange={setIsSettingDialogOpen} open={isSettingsDialogOpen}>
             <SheetTrigger asChild>
-              <Settings
-                animate="path-loop"
-                animateOnHover
-                className="size-4 cursor-pointer hover:fill-primary"
-              />
+              <Button className="my-4 size-12" ripple size="icon" variant="ghost">
+                <Settings animate="path-loop" animateOnHover />
+              </Button>
             </SheetTrigger>
             <AppSettingsSheet
               isSettingsOpen={isSettingsDialogOpen}
@@ -73,7 +73,7 @@ export function SidebarToolbar() {
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className={cn('my-4 size-7 cursor-pointer')} size="icon" variant="ghost">
+              <Button className="my-4 size-12" ripple size="icon" variant="ghost">
                 {session?.user?.image && (
                   <div
                     className="size-7 rounded-full bg-cover"

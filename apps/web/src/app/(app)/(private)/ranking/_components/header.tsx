@@ -77,7 +77,7 @@ export function Header({
                 type="button"
               >
                 <CirclePlus animate="path-loop" animateOnHover animateOnTap />
-                Adicionar Nova Lista
+                <span className="hidden md:block">Adicionar Nova Lista</span>
               </BlobButton>
             </DialogTrigger>
             <AddRankingDialog onSubmit={handleSubmit} selectedList={selectedList} />

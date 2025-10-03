@@ -1,3 +1,4 @@
+import type { Club } from '@nathy/web/types/club'
 import type { Game } from './game'
 import type { Platform } from './platform'
 
@@ -6,6 +7,8 @@ export type GroupedList = {
   title: string
   slug: string
   platform: Platform
+  isClub?: boolean
+  clubs?: Club
   games: Game[]
 }
 

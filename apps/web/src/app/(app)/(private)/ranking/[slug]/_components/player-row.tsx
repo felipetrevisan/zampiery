@@ -20,7 +20,7 @@ export function PlayerRow({ player, index, onDelete }: RowProps) {
     <>
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 right-0 w-1/5',
+          'pointer-events-none absolute inset-y-0 right-0 w-1/4 sm:w-1/5',
           'bg-gradient-to-r from-transparent',
           index === 0 && 'to-yellow-600 dark:to-yellow-400/20',
           index === 1 && 'to-gray-300/40',
@@ -30,21 +30,22 @@ export function PlayerRow({ player, index, onDelete }: RowProps) {
 
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 left-0 flex w-1/5 items-center',
+          'pointer-events-none absolute inset-y-0 left-0 flex w-1/4 items-center sm:w-1/5',
           'bg-gradient-to-r to-transparent',
           index === 0 && 'from-yellow-600/20 dark:from-yellow-400/20',
           index === 1 && 'from-gray-300/20',
           index === 2 && 'from-orange-400/20',
         )}
       >
-        <span className="relative z-10 px-4 font-extrabold font-russo text-5xl text-accent-foreground">
+        <span className="relative z-10 px-2 font-extrabold font-russo text-3xl text-accent-foreground sm:px-4 sm:text-4xl md:text-5xl">
           {formatOrdinals(index + 1)}
         </span>
       </div>
-      <div className="flex items-center justify-between space-x-4 px-20 py-4">
+
+      <div className='flex items-center justify-between gap-3 px-10 py-3 sm:px-10 sm:py-4 md:w-full md:px-20'>
         {player.avatar && (
           <div
-            className="size-8 rounded-full bg-cover"
+            className="size-8 rounded-full bg-cover sm:size-10 md:size-12"
             style={{
               backgroundImage: `url(${getDicebearUrl({
                 url: player.avatar,
@@ -53,10 +54,13 @@ export function PlayerRow({ player, index, onDelete }: RowProps) {
             }}
           />
         )}
-        <div className="w-[300px] flex-1 font-bold text-accent-foreground text-xl">
+
+        <div className="flex-1 truncate font-bold text-accent-foreground text-base sm:text-lg md:text-xl">
           {player.name}
         </div>
       </div>
+
+      {/* toolbar */}
       <Toolbar<Player>
         buttons={[
           {
@@ -67,12 +71,14 @@ export function PlayerRow({ player, index, onDelete }: RowProps) {
             onClick: (player) => onDelete(player.id),
           },
         ]}
-        className="opacity-0 transition-opacity ease-in-out group-hover:opacity-100"
+        className="md:opacity-0 md:transition-opacity md:ease-in-out md:group-hover:opacity-100"
         context={player}
       />
+
+      {/* medalha */}
       {index < 3 && (
         <div
-          className="medal absolute right-10 z-1 size-[56px] rounded-full backdrop-blur-xl"
+          className="medal absolute right-4 size-10 rounded-full backdrop-blur-xl sm:right-6 sm:size-12 md:right-10 md:size-[56px]"
           data-medal={index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}
         />
       )}

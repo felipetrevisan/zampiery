@@ -84,21 +84,22 @@ export function GroupedListTable({ allData, onSelectedDate, onDialogOpen, isPend
       {isPending ? (
         <LoadingDates />
       ) : !sortedDates?.length ? (
-        <div className="group space-y-6 rounded-2xl border-1 border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50">
-          <div className="p-10">
-            <div className="flex items-center justify-center space-x-2 text-primary-foreground">
-              Nenhuma data de jogos encontrado
+        <div className="group space-y-6 rounded-2xl border border-primary/20 bg-primary/20 p-3 backdrop-blur-2xl hover:border-accent/50 hover:bg-primary/80 dark:bg-background/50">
+          <div className="p-6 sm:p-10">
+            <div className="flex items-center justify-center text-center font-medium text-primary-foreground text-sm sm:text-base">
+              Nenhuma data de jogos encontrada
             </div>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
+          {/* Jogos de Hoje */}
           <Collapsible
-            className="flex w-full flex-col rounded-2xl border border-primary/20 bg-primary/10 p-3 backdrop-blur-2xl"
+            className="flex w-full flex-col rounded-2xl border border-primary/20 bg-primary/10 p-3 backdrop-blur-2xl sm:p-4"
             defaultOpen
           >
-            <CollapsibleTrigger>
-              <div className="flex items-center font-bold font-inter text-2xl text-accent">
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center font-bold font-inter text-accent text-xl sm:text-2xl">
                 <span>Jogos de Hoje</span>
               </div>
             </CollapsibleTrigger>
@@ -115,16 +116,18 @@ export function GroupedListTable({ allData, onSelectedDate, onDialogOpen, isPend
                   />
                 ))}
                 {!todayGames.length && (
-                  <div className="flex items-center justify-center font-bold font-inter text-primary-foreground">
+                  <div className="flex items-center justify-center font-inter font-semibold text-primary-foreground text-sm sm:text-base">
                     <span>Nenhum jogo hoje até o momento</span>
                   </div>
                 )}
               </div>
             </CollapsibleContent>
           </Collapsible>
-          <Collapsible className="flex w-full flex-col rounded-2xl border border-primary/20 bg-primary/10 p-3 backdrop-blur-2xl">
-            <CollapsibleTrigger className="font-semibold text-lg">
-              <div className="flex items-center font-bold font-inter text-2xl text-accent">
+
+          {/* Jogos Passados */}
+          <Collapsible className="flex w-full flex-col rounded-2xl border border-primary/20 bg-primary/10 p-3 backdrop-blur-2xl sm:p-4">
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center font-bold font-inter text-accent text-xl sm:text-2xl">
                 <span>Jogos Passados</span>
               </div>
             </CollapsibleTrigger>
@@ -141,7 +144,7 @@ export function GroupedListTable({ allData, onSelectedDate, onDialogOpen, isPend
                   />
                 ))}
                 {!pastGames.length && (
-                  <div className="flex items-center justify-center font-bold font-inter text-primary-foreground">
+                  <div className="flex items-center justify-center font-inter font-semibold text-primary-foreground text-sm sm:text-base">
                     <span>Nenhum jogo encontrado</span>
                   </div>
                 )}

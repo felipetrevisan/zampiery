@@ -1,6 +1,6 @@
 'use client'
 
-import { useIsMobile } from '@nathy/shared/hooks/use-is-mobile'
+import { useMediaQuery } from '@nathy/shared/hooks/use-media-query'
 import { cn } from '@nathy/shared/lib/utils'
 import {
   MotionHighlight,
@@ -71,7 +71,7 @@ function SidebarProvider({
   children,
   ...props
 }: SidebarProviderProps) {
-  const isMobile = useIsMobile()
+  const isMobile = useMediaQuery()
   const [openMobile, setOpenMobile] = React.useState(false)
 
   // This is the internal state of the sidebar.
@@ -308,11 +308,7 @@ function SidebarTrigger({ className, onClick, ...props }: SidebarTriggerProps) {
       }}
       {...props}
     >
-      <PanelLeft
-        animate="path-loop"
-        animateOnHover
-        className={cn('size-4 cursor-pointer hover:fill-primary', className)}
-      />
+      <PanelLeft animate="path-loop" animateOnHover className={cn('size-4', className)} />
     </motion.div>
   )
 }

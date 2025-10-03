@@ -34,7 +34,13 @@ export async function sanityFetch<QueryResponse>({
       useCdn: false,
       // And we can't cache the responses as it would slow down the live preview experience
       next: { revalidate: 0 },
+
     })
+  }
+
+  if (env.NODE_ENV !== 'production' && env.SHOW_GROQ) {
+    console.log(`Query with ${params}`)
+    console.log(query)
   }
 
   return client.fetch<QueryResponse>(query, params, {

@@ -1,5 +1,6 @@
 'use client'
 
+import { useMediaQuery } from '@nathy/shared/hooks/use-media-query'
 import type { PaginatedPlayers, Player } from '@nathy/web/types/player'
 import type {
   FetchNextPageOptions,
@@ -42,10 +43,14 @@ export function PlayersTable({
   const parentRef = useRef<HTMLDivElement | null>(null)
   const loaderRef = useRef<HTMLDivElement | null>(null)
 
+  const isMobile = useMediaQuery()
+
+  const gap = isMobile ? 1 : 1.06
+
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allPlayers?.length + 1 : allPlayers?.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 102 * 1.06,
+    estimateSize: () => 102 * gap,
     overscan: 5,
     getItemKey: (index) => allPlayers[index]?.id ?? `loader-${index}`,
     measureElement: (el) => el.getBoundingClientRect().height,

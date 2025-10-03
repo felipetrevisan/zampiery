@@ -18,7 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <SidebarToolbar />
         <div>
           <Background />
-          <div className="relative z-10 mx-4 mb-10">{children}</div>
+          <div className="relative z-10 mb-10 md:mx-4">{children}</div>
           <CatEasterEgg />
         </div>
         <svg className="hidden" version="1.1" xmlns="http://www.w3.org/2000/svg">

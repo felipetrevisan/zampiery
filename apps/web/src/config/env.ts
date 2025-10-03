@@ -18,6 +18,7 @@ export const env = createEnv({
   server: {
     SANITY_API_READ_TOKEN: z.string().refine(requiredOnEnv('production')),
     SANITY_API_WRITE_TOKEN: z.string().refine(requiredOnEnv('production')),
+    SHOW_GROQ: z.boolean().refine(requiredOnEnv('development'))
   },
   client: {
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
@@ -48,6 +49,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     NODE_ENV: process.env.NODE_ENV,
     VERCEL_ENV: process.env.VERCEL_ENV,
+    SHOW_GROQ: Boolean(process.env.SHOW_GROQ)
   },
   clientPrefix: 'NEXT_PUBLIC_',
   skipValidation: process.env.SKIP_ENV_VALIDATION === 'true',

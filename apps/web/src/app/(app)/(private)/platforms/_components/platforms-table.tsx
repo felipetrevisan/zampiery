@@ -1,5 +1,6 @@
 'use client'
 
+import { useMediaQuery } from '@nathy/shared/hooks/use-media-query'
 import type { PaginatedPlatforms, Platform } from '@nathy/web/types/platform'
 import type {
   FetchNextPageOptions,
@@ -42,10 +43,14 @@ export function PlatformsTable({
   const parentRef = useRef<HTMLDivElement | null>(null)
   const loaderRef = useRef<HTMLDivElement | null>(null)
 
+  const isMobile = useMediaQuery()
+
+  const gap = isMobile ? 1 : 1.48
+
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allPlatforms?.length + 1 : allPlatforms?.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 102 * 1.48,
+    estimateSize: () => 102 * gap,
     overscan: 5,
     getItemKey: (index) => allPlatforms[index]?.id ?? `loader-${index}`,
     measureElement: (el) => el.getBoundingClientRect().height,

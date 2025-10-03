@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useMediaQuery } from '@nathy/shared/hooks/use-media-query'
 import { cn } from '@nathy/shared/lib/utils'
 import { mutateUpdateOrder } from '@nathy/web/server/ranking'
 import type { Player } from '@nathy/web/types/player'
@@ -103,9 +104,13 @@ export function RankingListPlayerTable({
   const parentRef = useRef<HTMLDivElement | null>(null)
   const loaderRef = useRef<HTMLDivElement | null>(null)
 
+  const isMobile = useMediaQuery()
+
+  const gap = isMobile ? .85 : 1.01
+
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allData?.length + 1 : allData?.length,
-    estimateSize: () => 102 * 1.01,
+    estimateSize: () => 102 * gap,
     getItemKey: (index) => allData[index]?.id ?? `loader-${index}`,
     getScrollElement: () => parentRef.current,
     measureElement: (el) => el.getBoundingClientRect().height,
